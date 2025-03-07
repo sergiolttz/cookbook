@@ -1,5 +1,15 @@
+from django import forms
 from django.contrib import admin
 from .models import Ingredient, Recipe, RecipeIngredient, Step
+
+class RecipeForm(forms.ModelForm):
+    time_required = forms.DurationField(
+        widget=forms.TextInput(attrs={'placeholder': 'DD HH:MM:SS'})
+    )
+
+    class Meta:
+        model = Recipe
+        fields = '__all__'
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -17,6 +27,7 @@ class StepInline(admin.TabularInline):
     extra = 1
 
 class RecipeAdmin(admin.ModelAdmin):
+    form = RecipeForm #formulario personalizado
     list_display = ('title', 'author', 'calification')
     search_fields = ('title', 'description')
     list_filter = ('author',)

@@ -11,11 +11,12 @@ class Recipe(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
-    image = models.ImageField(upload_to="images/")
-    time_required = models.CharField(max_length=50)
-    servings = models.CharField(max_length=50)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="images/", default="images/default.jpg")
+    time_required = models.DurationField()
+    servings = models.PositiveIntegerField(default=1)
     calification = models.CharField(max_length=50)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return self.title
