@@ -1,0 +1,31 @@
+{% extends '__base.html' %}
+
+{% block content %}
+<h2>Lista de Recetas</h2>
+
+{% for recipe in recipe_list %}
+<div>
+    <h3>
+        <a href="{% comment %}{% url 'recipe_detail' recipe.pk %}{% endcomment %}#">{{ recipe.title }}</a>
+    </h3>
+
+    {% if recipe.image %}
+    <a href="{% comment %}{% url 'recipe_detail' recipe.pk %}{% endcomment %}#">
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+    </a>
+    {% endif %}
+
+    <p>{{ recipe.description }}</p>
+    <p>Tiempo requerido: {{ recipe.time_required }}</p>
+    <p>Porciones: {{ recipe.servings }}</p>
+    <p>Calificación: {{ recipe.calification }}</p>
+
+    {% with ingredients_count=recipe.ingredients.count %}
+    <p>{{ ingredients_count }} ingredientes</p>
+    {% endwith %}
+
+    <a href="{% comment %}{% url 'recipe_detail' recipe.pk %}{% endcomment %}#">Ver detalles</a>
+</div>
+{% endfor %}
+
+{% endblock content %}
