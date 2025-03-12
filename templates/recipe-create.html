@@ -1,0 +1,13 @@
+{% extends '__base.html' %}
+
+{% block content %}
+<h2>Crear Nueva Receta</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar Receta</button>
+</form>
+
+<a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
+{% endblock content %}

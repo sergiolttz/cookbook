@@ -8,10 +8,12 @@
 </head>
 
 <body>
+
     <header>
         <h1>
-            <a href="">CookBook</a>
+            <a href="{% url 'recipes-list' %}">CookBook</a>
         </h1>
+        <a href="{% url 'recipe-create' %}">Crear Nueva Receta</a>
     </header>
     <div>
         {% block content %}

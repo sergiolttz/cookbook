@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #local apps
     "recipes",
+    #third party apps
+    'django_select2',
 ]
 
 MIDDLEWARE = [

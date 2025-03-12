@@ -3,6 +3,8 @@
 {% block content %}
 <h2>Lista de Recetas</h2>
 
+<a href="{% url 'recipe-create' %}">Crear Nueva Receta</a>
+
 {% for recipe in recipe_list %}
 <div>
     <h3>
