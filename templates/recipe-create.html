@@ -36,9 +36,20 @@
         </div>
     </div>
     <button type="button" id="add-ingredient">Agregar Ingrediente</button>
-
+    
+    <h3>Pasos a Seguir</h3>
+    <div id="steps-container">
+        <div class="step-row">
+            <label for="step_description">Paso 1:</label>
+            <textarea name="step_description" id="step_description_0"></textarea>
+            <button type="button" class="remove-step">Eliminar</button>
+        </div>
+    </div>
+    <button type="button" id="add-step">Agregar Paso</button>
+    
     <button type="submit">Guardar Receta</button>
-</form>
+
+</form> 
 
 <a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
 
@@ -77,6 +88,30 @@
         });
 
         ingredientsContainer.querySelector('.remove-ingredient').addEventListener('click', function () {
+            this.parentElement.remove();
+        });
+                const stepsContainer = document.getElementById('steps-container');
+        const addStepButton = document.getElementById('add-step');
+        let stepCount = 1;
+
+        addStepButton.addEventListener('click', function () {
+            stepCount++;
+            const timestamp = new Date().getTime();
+            const newRow = document.createElement('div');
+            newRow.classList.add('step-row');
+            newRow.innerHTML = `
+                <label for="step_description">Paso ${stepCount}:</label>
+                <textarea name="step_description" id="step_description_${timestamp}"></textarea>
+                <button type="button" class="remove-step">Eliminar</button>
+            `;
+            stepsContainer.appendChild(newRow);
+
+            newRow.querySelector('.remove-step').addEventListener('click', function () {
+                newRow.remove();
+            });
+        });
+
+        stepsContainer.querySelector('.remove-step').addEventListener('click', function () {
             this.parentElement.remove();
         });
     });

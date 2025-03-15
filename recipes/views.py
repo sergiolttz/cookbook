@@ -1,8 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import RecipeForm
-from .models import Recipe, Ingredient, RecipeIngredient
-from django.contrib.auth.decorators import login_required
-
+from .models import Recipe, Ingredient, RecipeIngredient, Step
 
 def recipe_list(request):
     """Vista para mostrar la lista de recetas."""
@@ -15,22 +13,7 @@ def recipe_detail(request, pk):
     return render(request, 'recipe-detail.html', {'recipe': recipe})
 
 
-"""
-@login_required  # Asegurar que el usuario esté logueado
-def recipe_create(request):
-    "Vista para crear una nueva receta."
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipe = form.save()  # Guarda la receta y crea ingredientes
-            recipe.author = request.user
-            recipe.save()  # Guarda la receta nuevamente para asignar el autor
 
-            return redirect('recipe-detail', pk=recipe.pk)
-    else:
-        form = RecipeForm()
-    return render(request, 'recipe-create.html', {'form': form})
-"""
 
 
 def recipe_create(request):
@@ -60,6 +43,13 @@ def recipe_create(request):
                         quantity=ingredient_quantity,
                         measurement=ingredient_measurement
                     )
+
+            # Manejar la creación de pasos
+            step_descriptions = request.POST.getlist('step_description')
+
+            for i, description in enumerate(step_descriptions):
+                if description:
+                    Step.objects.create(recipe=recipe, step_number=i + 1, description=description)
 
             return redirect('recipe-detail', pk=recipe.pk)
     else:
