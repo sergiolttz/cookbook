@@ -1,6 +1,7 @@
 from django import forms
 from django.forms.widgets import NumberInput
 from datetime import timedelta
+from .models import Recipe, Ingredient, RecipeIngredient
 
 class RecipeDurationWidget(forms.MultiWidget):
     def __init__(self, attrs=None):

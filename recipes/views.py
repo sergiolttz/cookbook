@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Recipe
 from .forms import RecipeForm
+from .models import Recipe, Ingredient, RecipeIngredient
+from django.contrib.auth.decorators import login_required
+
 
 def recipe_list(request):
     """Vista para mostrar la lista de recetas."""
@@ -12,6 +14,25 @@ def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)    
     return render(request, 'recipe-detail.html', {'recipe': recipe})
 
+
+"""
+@login_required  # Asegurar que el usuario esté logueado
+def recipe_create(request):
+    "Vista para crear una nueva receta."
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save()  # Guarda la receta y crea ingredientes
+            recipe.author = request.user
+            recipe.save()  # Guarda la receta nuevamente para asignar el autor
+
+            return redirect('recipe-detail', pk=recipe.pk)
+    else:
+        form = RecipeForm()
+    return render(request, 'recipe-create.html', {'form': form})
+"""
+
+
 def recipe_create(request):
     """Vista para crear una nueva receta."""
     if request.method == 'POST':
@@ -20,7 +41,26 @@ def recipe_create(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-            form.save_m2m() #para guardar las relaciones many to many
+
+            # Manejar la creación de múltiples ingredientes
+            ingredient_names = request.POST.getlist('ingredient_name')
+            ingredient_quantities = request.POST.getlist('ingredient_quantity')
+            ingredient_measurements = request.POST.getlist('ingredient_measurement')
+
+            for i in range(len(ingredient_names)):
+                ingredient_name = ingredient_names[i]
+                ingredient_quantity = ingredient_quantities[i]
+                ingredient_measurement = ingredient_measurements[i]
+
+                if ingredient_name and ingredient_quantity and ingredient_measurement:
+                    ingredient, created = Ingredient.objects.get_or_create(name=ingredient_name)
+                    RecipeIngredient.objects.create(
+                        recipe=recipe,
+                        ingredient=ingredient,
+                        quantity=ingredient_quantity,
+                        measurement=ingredient_measurement
+                    )
+
             return redirect('recipe-detail', pk=recipe.pk)
     else:
         form = RecipeForm()

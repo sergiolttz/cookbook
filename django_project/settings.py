@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     #local apps
     "recipes",
     #third party apps
-    'django_select2',
 ]
 
 MIDDLEWARE = [
