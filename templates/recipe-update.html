@@ -1,0 +1,111 @@
+{% extends '__base.html' %}
+
+{% block content %}
+<h2>Editar Receta: {{ recipe.title }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.title.label_tag }} {{ form.title }}
+    {{ form.description.label_tag }} {{ form.description }}
+    {{ form.image.label_tag }} {{ form.image }}
+    {{ form.time_required.label_tag }} {{ form.time_required }}
+    {{ form.servings.label_tag }} {{ form.servings }}
+    {{ form.calification.label_tag }} {{ form.calification }}
+
+    {# ... (resto del formulario) ... #}
+
+    <button type="submit">Guardar Cambios</button>
+</form>
+
+<a href="{% url 'recipe-detail' pk=recipe.pk %}">Volver a la receta</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+            // Ingredientes
+            const ingredientsContainer = document.getElementById('ingredients-container');
+            const addIngredientButton = document.getElementById('add-ingredient');
+
+            addIngredientButton.addEventListener('click', function () {
+                const timestamp = new Date().getTime();
+                const newRow = document.createElement('div');
+                newRow.classList.add('ingredient-row');
+                newRow.innerHTML = `
+            <label for="ingredient_name">Nombre Ingrediente</label>
+            <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
+            <label for="ingredient_quantity">Cantidad</label>
+            <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
+            <label for="ingredient_measurement">Medida</label>
+            <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
+                {% for choice in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
+                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="remove-ingredient">Eliminar</button>
+        `;
+                ingredientsContainer.appendChild(newRow);
+
+                newRow.querySelector('.remove-ingredient').addEventListener('click', function () {
+                    newRow.remove();
+                });
+        
+                addStepButton.addEventListener('click', function () {
+                    const timestamp = new Date().getTime();
+                    const newRow = document.createElement('div');
+                    newRow.classList.add('step-row');
+                    newRow.innerHTML = `
+                    <label for="step_description">Paso ${stepCount}:</label>
+                    <textarea name="step_description" id="step_description_${timestamp}"></textarea>
+                    <button type="button" class="remove-step">Eliminar</button>
+                `;
+                    stepsContainer.appendChild(newRow);
+        
+                    newRow.querySelector('.remove-step').addEventListener('click', function () {
+                        newRow.remove();
+                    });
+                    stepCount++;
+                });
+        
+                stepsContainer.querySelectorAll('.remove-step').forEach(button => {
+                    button.addEventListener('click', function () {
+                        this.parentElement.remove();
+                });
+            });
+
+            ingredientsContainer.querySelectorAll('.remove-ingredient').forEach(button => {
+                button.addEventListener('click', function () {
+                    this.parentElement.remove();
+                });
+            });
+
+            // Pasos
+            const stepsContainer = document.getElementById('steps-container');
+            const addStepButton = document.getElementById('add-step');
+            let stepCount = parseInt("{{ recipe.steps.count|add:1 }}", 10);
+        });
+
+        addStepButton.addEventListener('click', function () {
+            const timestamp = new Date().getTime();
+            const newRow = document.createElement('div');
+            newRow.classList.add('step-row');
+            newRow.innerHTML = `
+            <label for="step_description">Paso ${stepCount}:</label>
+            <textarea name="step_description" id="step_description_${timestamp}"></textarea>
+            <button type="button" class="remove-step">Eliminar</button>
+        `;
+            stepsContainer.appendChild(newRow);
+
+            newRow.querySelector('.remove-step').addEventListener('click', function () {
+                newRow.remove();
+            });
+            stepCount++;
+        });
+
+        stepsContainer.querySelectorAll('.remove-step').forEach(button => {
+            button.addEventListener('click', function () {
+                this.parentElement.remove();
+            });
+        });
+});
+</script>
+{% endblock content %}

@@ -12,10 +12,6 @@ def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)    
     return render(request, 'recipe-detail.html', {'recipe': recipe})
 
-
-
-
-
 def recipe_create(request):
     """Vista para crear una nueva receta."""
     if request.method == 'POST':
@@ -55,3 +51,50 @@ def recipe_create(request):
     else:
         form = RecipeForm()
     return render(request, 'recipe-create.html', {'form': form})
+
+def recipe_update(request, pk):
+    """Vista para editar una receta existente."""
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES, instance=recipe)
+        if form.is_valid():
+            recipe = form.save()
+
+            # Manejar la actualización de ingredientes
+            ingredient_names = request.POST.getlist('ingredient_name')
+            ingredient_quantities = request.POST.getlist('ingredient_quantity')
+            ingredient_measurements = request.POST.getlist('ingredient_measurement')
+
+            # Eliminar ingredientes existentes
+            recipe.recipeingredient_set.all().delete()
+
+            for i in range(len(ingredient_names)):
+                ingredient_name = ingredient_names[i]
+                ingredient_quantity = ingredient_quantities[i]
+                ingredient_measurement = ingredient_measurements[i]
+
+                if ingredient_name and ingredient_quantity and ingredient_measurement:
+                    ingredient, created = Ingredient.objects.get_or_create(name=ingredient_name)
+                    RecipeIngredient.objects.create(
+                        recipe=recipe,
+                        ingredient=ingredient,
+                        quantity=ingredient_quantity,
+                        measurement=ingredient_measurement
+                    )
+
+            # Manejar la actualización de pasos
+            step_descriptions = request.POST.getlist('step_description')
+
+            # Eliminar pasos existentes
+            recipe.steps.all().delete()
+
+            for i, description in enumerate(step_descriptions):
+                if description:
+                    Step.objects.create(recipe=recipe, step_number=i + 1, description=description)
+
+            return redirect('recipe-detail', pk=recipe.pk)
+    else:
+        form = RecipeForm(instance=recipe)
+
+    return render(request, 'recipe-update.html', {'form': form, 'recipe': recipe})

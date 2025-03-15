@@ -1,7 +1,6 @@
 from django import forms
 from django.forms.widgets import NumberInput
 from datetime import timedelta
-from .models import Recipe, Ingredient, RecipeIngredient
 
 class RecipeDurationWidget(forms.MultiWidget):
     def __init__(self, attrs=None):
@@ -12,7 +11,8 @@ class RecipeDurationWidget(forms.MultiWidget):
         super().__init__(widgets, attrs)
 
     def decompress(self, value):
-        if value:
+        print(f"Valor recibido en decompress(): {value}")  # Agregar print() statement
+        if isinstance(value, timedelta):
             hours, remainder = divmod(value.total_seconds(), 3600)
             minutes = remainder // 60
             return [int(hours), int(minutes)]
@@ -20,7 +20,7 @@ class RecipeDurationWidget(forms.MultiWidget):
 
     def value_from_datadict(self, data, files, name):
         values = super().value_from_datadict(data, files, name)
-        if all(values):
+        if isinstance(values, list) and len(values) == 2 and all(values):
             try:
                 hours = int(values[0])
                 minutes = int(values[1])
@@ -28,3 +28,5 @@ class RecipeDurationWidget(forms.MultiWidget):
             except ValueError:
                 return None
         return None
+    
+
