@@ -2,6 +2,7 @@
 
 {% block content %}
 <h2>Editar Receta: {{ recipe.title }}</h2>
+<a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -13,7 +14,56 @@
     {{ form.servings.label_tag }} {{ form.servings }}
     {{ form.calification.label_tag }} {{ form.calification }}
 
-    {# ... (resto del formulario) ... #}
+    <h3>Agregar Ingrediente</h3>
+    <div id="ingredients-container">
+        {% for ingredient in recipe.recipeingredient_set.all %}
+        <div class="ingredient-row">
+            <label for="ingredient_name">Nombre Ingrediente</label>
+            <input type="text" name="ingredient_name" value="{{ ingredient.ingredient.name }}">
+            <label for="ingredient_quantity">Cantidad</label>
+            <input type="text" name="ingredient_quantity" value="{{ ingredient.quantity }}">
+            <label for="ingredient_measurement">Medida</label>
+            <select name="ingredient_measurement">
+                {% for option, display in ingredient.MEASUREMENT_CHOICES %}
+                <option value="{{ option }}" {% if option in ingredient.measurement|make_list %}selected{% endif %}>{{ display }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="button" class="remove-ingredient">Eliminar</button>
+        </div>
+        {% endfor %}
+        <div class="ingredient-row">
+            <label for="ingredient_name">Nombre Ingrediente</label>
+            <input type="text" name="ingredient_name">
+            <label for="ingredient_quantity">Cantidad</label>
+            <input type="text" name="ingredient_quantity">
+            <label for="ingredient_measurement">Medida</label>
+            <select name="ingredient_measurement">
+                {% for choice in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
+                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="remove-ingredient">Eliminar</button>
+        </div>
+    </div>
+    <button type="button" id="add-ingredient">Agregar Ingrediente</button>
+
+    <h3>Pasos a Seguir</h3>
+    <div id="steps-container">
+        {% for step in recipe.steps.all %}
+        <div class="step-row">
+            <label for="step_description">Paso {{ step.step_number }}:</label>
+            <textarea name="step_description">{{ step.description }}</textarea>
+            <button type="button" class="remove-step">Eliminar</button>
+        </div>
+        {% endfor %}
+        <div class="step-row">
+            <label for="step_description">Paso {{ recipe.steps.count|add:1 }}:</label>
+            <textarea name="step_description"></textarea>
+            <button type="button" class="remove-step">Eliminar</button>
+        </div>
+    </div>
+    <button type="button" id="add-step">Agregar Paso</button>
 
     <button type="submit">Guardar Cambios</button>
 </form>

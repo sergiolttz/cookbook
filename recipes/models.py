@@ -26,19 +26,16 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=5, decimal_places=2)  # Cambiado a DecimalField
     MEASUREMENT_CHOICES = [
-        ('u', 'Unidades'),
-        ('g', 'Gramos'),
-        ('kg', 'Kilos'),
-        ('l', 'Litros'),
-        ('ml', 'Mililitros'),
-        ('tz', 'Tazas'),
-        ('cdta', 'Cucharaditas'),
-        ('cda', 'Cucharadas'),
-        ('pz', 'Pizca'),        
-        ('oz', 'Onzas'),
-        ('lb', 'Libras'),        
-    ]
-    measurement = models.CharField(max_length=20, choices=MEASUREMENT_CHOICES, default='gramos')
+            ('gr', 'Gramos'),
+            ('kg', 'Kilogramos'),
+            ('ml', 'Mililitros'),
+            ('l', 'Litros'),
+            ('tz', 'Taza'),
+            ('cdta', 'Cucharadita'),
+            ('cda', 'Cucharada'),
+            ('u', 'Unidad'),
+        ]
+    measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES, default='gramos')
 
     def __str__(self):
         return f'{self.ingredient.name} en {self.recipe.title}'

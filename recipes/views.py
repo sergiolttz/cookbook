@@ -98,3 +98,13 @@ def recipe_update(request, pk):
         form = RecipeForm(instance=recipe)
 
     return render(request, 'recipe-update.html', {'form': form, 'recipe': recipe})
+
+def recipe_delete(request, pk):
+    """Vista para eliminar una receta."""
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    if request.method == 'POST':
+        recipe.delete()
+        return redirect('recipes-list')
+
+    return render(request, 'recipe-delete.html', {'recipe': recipe})
