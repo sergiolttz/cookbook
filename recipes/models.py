@@ -24,7 +24,7 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=5, decimal_places=2)  # Cambiado a DecimalField
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
     MEASUREMENT_CHOICES = [
             ('gr', 'Gramos'),
             ('kg', 'Kilogramos'),
@@ -35,7 +35,7 @@ class RecipeIngredient(models.Model):
             ('cda', 'Cucharada'),
             ('u', 'Unidad'),
         ]
-    measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES, default='gramos')
+    measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES)
 
     def __str__(self):
         return f'{self.ingredient.name} en {self.recipe.title}'

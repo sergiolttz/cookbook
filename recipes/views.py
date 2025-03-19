@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import RecipeForm
 from .models import Recipe, Ingredient, RecipeIngredient, Step
+import pdfkit
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 def recipe_list(request):
     """Vista para mostrar la lista de recetas."""
@@ -108,3 +111,23 @@ def recipe_delete(request, pk):
         return redirect('recipes-list')
 
     return render(request, 'recipe-delete.html', {'recipe': recipe})
+
+def recipe_pdf(request, pk):
+    """Vista para generar un PDF de la receta."""
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    # Generar la URL absoluta de la imagen
+    image_url = request.build_absolute_uri(recipe.image.url) if recipe.image else None
+
+    html_string = render_to_string('recipe-pdf.html', {'recipe': recipe, 'image_url': image_url})
+
+    config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe') # Reemplaza con la ruta correcta
+    options = {
+        'encoding': 'UTF-8',
+    }
+    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{recipe.title}.pdf"'
+
+    return response

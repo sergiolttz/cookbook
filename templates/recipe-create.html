@@ -66,7 +66,7 @@
                 <label for="ingredient_name">Nombre Ingrediente</label>
                 <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
                 <label for="ingredient_quantity">Cantidad</label>
-                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
+                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" onchange="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
                 <label for="ingredient_measurement">Medida</label>
                 <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
                     <option value="gr">Gramos</option>

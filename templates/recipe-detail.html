@@ -30,7 +30,19 @@
         <li>{{ step.description }}</li>
         {% endfor %}
     </ol>
-
-    <a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
+<button id="copy-link">Copiar Enlace</button>
+<input type="text" id="recipe-link" value="{{ request.build_absolute_uri }}" readonly style="display: none;">
+<a href="{% url 'recipe-pdf' pk=recipe.pk %}" class="btn btn-primary">Descargar PDF</a>
+<a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
 </div>
+
+<script>
+    document.getElementById('copy-link').addEventListener('click', function () {
+        var recipeLink = document.getElementById('recipe-link');
+        recipeLink.style.display = 'block';
+        recipeLink.select();
+        document.execCommand('copy');
+        alert('Copiado al portapapeles');
+    });
+</script>
 {% endblock content %}

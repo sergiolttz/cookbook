@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ recipe.title }}</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        ul,
+        ol {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>{{ recipe.title }}</h1>
+    {% if image_url %}
+    <img src="{{ image_url }}" alt="{{ recipe.title }}">
+    {% endif %}
+    <p>{{ recipe.description }}</p>
+    <p>Tiempo requerido: {{ recipe.time_required }}</p>
+    <p>Porciones: {{ recipe.servings }}</p>
+    <p>Calificación: {{ recipe.calification }}</p>
+
+    <h2>Ingredientes</h2>
+    <ul>
+        {% for ingredient in recipe.recipeingredient_set.all %}
+        <li>{{ ingredient.quantity }} {{ ingredient.get_measurement_display }} de {{ ingredient.ingredient.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Pasos</h2>
+    <ol>
+        {% for step in recipe.steps.all %}
+        <li>{{ step.description }}</li>
+        {% endfor %}
+    </ol>
+</body>
+
+</html>
