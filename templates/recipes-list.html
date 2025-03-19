@@ -5,28 +5,33 @@
 
 <a href="{% url 'recipe-create' %}">Crear Nueva Receta</a>
 
-{% for recipe in recipe_list %}
+{% for item in recipe_ratings %}
 <div>
     <h3>
-        <a href="{% url 'recipe-detail' recipe.pk %}">{{ recipe.title }}</a>
+        <a href="{% url 'recipe-detail' item.recipe.pk %}">{{ item.recipe.title }}</a>
     </h3>
 
-    {% if recipe.image %}
-    <a href="{% url 'recipe-detail' recipe.pk %}">
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+    {% if item.recipe.image %}
+    <a href="{% url 'recipe-detail' item.recipe.pk %}">
+        <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}" style="max-width: 200px;">
     </a>
     {% endif %}
 
-    <p>{{ recipe.description }}</p>
-    <p>Tiempo requerido: {{ recipe.time_required }}</p>
-    <p>Porciones: {{ recipe.servings }}</p>
-    <p>Calificación: {{ recipe.calification }}</p>
+    <p>{{ item.recipe.description }}</p>
+    <p>Tiempo requerido: {{ item.recipe.time_required }}</p>
+    <p>Porciones: {{ item.recipe.servings }}</p>
 
-    {% with ingredients_count=recipe.ingredients.count %}
+    {% if item.average_rating %}
+    <p>Calificación: {{ item.average_rating|floatformat:1 }}</p>
+    {% else %}
+    <p>Calificación: Sin calificar</p>
+    {% endif %}
+
+    {% with ingredients_count=item.recipe.ingredients.count %}
     <p>{{ ingredients_count }} ingredientes</p>
     {% endwith %}
 
-    <a href="{% url 'recipe-detail' recipe.pk %}">Ver detalles</a>
+    <a href="{% url 'recipe-detail' item.recipe.pk %}">Ver detalles</a>
 </div>
 {% endfor %}
 

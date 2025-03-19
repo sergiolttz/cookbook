@@ -14,12 +14,26 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to="images/", default="images/default.jpg")
     time_required = models.DurationField()
     servings = models.PositiveIntegerField(default=1)
-    calification = models.CharField(max_length=50)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    
 
     def __str__(self):
         return self.title
+
+class Rating(models.Model):
+    RATING_CHOICES = [
+        (1, '1 estrella'),
+        (2, '2 estrellas'),
+        (3, '3 estrellas'),
+        (4, '4 estrellas'),
+        (5, '5 estrellas'),
+    ]
+
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(choices=RATING_CHOICES)
+
+    class Meta:
+        unique_together = ('recipe', 'user')
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

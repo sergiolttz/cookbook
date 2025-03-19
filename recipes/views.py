@@ -1,21 +1,55 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import RecipeForm
-from .models import Recipe, Ingredient, RecipeIngredient, Step
+from .forms import RecipeForm, RatingForm 
+from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating
 import pdfkit
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
 
 
 def recipe_list(request):
-    """Vista para mostrar la lista de recetas."""
-    recipe_list = Recipe.objects.all()
-    return render(request, 'recipes-list.html', {'recipe_list': recipe_list})
+    """Vista para mostrar la lista de recetas. """
+    recipe_list = Recipe.objects.all() 
+    recipe_ratings = []
+    for recipe in recipe_list:
+        ratings = Rating.objects.filter(recipe=recipe)
+        average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+        recipe_ratings.append({'recipe': recipe, 'average_rating': average_rating})
+
+    return render(request, 'recipes-list.html', {'recipe_ratings': recipe_ratings})
 
 def recipe_detail(request, pk):
-    """Vista para mostrar el detalle de una receta."""
-    recipe = get_object_or_404(Recipe, pk=pk)    
-    return render(request, 'recipe-detail.html', {'recipe': recipe})
+    """Vista para mostrar el detalle de una receta y manejar las calificaciones."""
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    # Lógica de calificación
+    ratings = Rating.objects.filter(recipe=recipe)
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            rating_value = form.cleaned_data['rating']
+            existing_rating = Rating.objects.filter(recipe=recipe, user=request.user).first()
+            if existing_rating:
+                existing_rating.rating = rating_value
+                existing_rating.save()
+            else:
+                Rating.objects.create(recipe=recipe, user=request.user, rating=rating_value)
+            # Recalcula el promedio después de guardar la calificación
+            ratings = Rating.objects.filter(recipe=recipe)
+            average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+    else:
+        form = RatingForm()
+
+    context = {
+        'recipe': recipe,
+        'average_rating': average_rating,
+        'form': form,
+    }
+
+    return render(request, 'recipe-detail.html', context)
 
 @login_required
 def recipe_create(request):
@@ -124,6 +158,7 @@ def recipe_delete(request, pk):
         return redirect('recipes-list')
 
     return render(request, 'recipe-delete.html', {'recipe': recipe})
+
 
 def recipe_pdf(request, pk):
     """Vista para generar un PDF de la receta."""

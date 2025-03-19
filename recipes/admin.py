@@ -28,7 +28,7 @@ class StepInline(admin.TabularInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     form = RecipeForm #formulario personalizado
-    list_display = ('title', 'author', 'calification')
+    list_display = ('title', 'author', 'time_required', 'servings') # Eliminado 'calification'
     search_fields = ('title', 'description')
     list_filter = ('author',)
     inlines = [RecipeIngredientInline, StepInline]
@@ -37,7 +37,7 @@ class RecipeAdmin(admin.ModelAdmin):
             'fields': ('title', 'description', 'author')
         }),
         ('Detalles de la receta', {
-            'fields': ('image', 'time_required', 'servings', 'calification')
+            'fields': ('image', 'time_required', 'servings') # Eliminado 'calification'
         }),
     )
 

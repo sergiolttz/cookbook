@@ -4,6 +4,22 @@
 <div class="recipe-detail">
     <h2>{{ recipe.title }}</h2>
 
+    {% if average_rating %}
+    <p><strong>Calificación Promedio:</strong> {{ average_rating|floatformat:1 }}</p>
+    {% else %}
+    <p>Esta receta aún no ha sido calificada.</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Calificar</button>
+    </form>
+    {% else %}
+    <p>Inicia sesión para calificar esta receta.</p>
+    {% endif %}
+
     {% if user.is_authenticated and user == recipe.author %}
     <a href="{% url 'recipe-update' pk=recipe.pk %}">Editar Receta</a>
     <a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
@@ -16,7 +32,6 @@
     <p><strong>Descripción:</strong> {{ recipe.description }}</p>
     <p><strong>Tiempo requerido:</strong> {{ recipe.time_required }}</p>
     <p><strong>Porciones:</strong> {{ recipe.servings }}</p>
-    <p><strong>Calificación:</strong> {{ recipe.calification }}</p>
     <p><strong>Autor:</strong> {{ recipe.author.username }}</p>
 
     <h3>Ingredientes:</h3>
