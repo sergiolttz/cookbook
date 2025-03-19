@@ -23,4 +23,5 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('recipes/', include('recipes.urls')),  # Incluye las URLs de la aplicación 'recipes'
+    path('accounts/', include('allauth.urls')),  # Incluye las URLs de la aplicación 'allauth'
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

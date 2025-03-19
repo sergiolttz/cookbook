@@ -4,6 +4,8 @@ from .models import Recipe, Ingredient, RecipeIngredient, Step
 import pdfkit
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
+
 
 def recipe_list(request):
     """Vista para mostrar la lista de recetas."""
@@ -15,6 +17,7 @@ def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)    
     return render(request, 'recipe-detail.html', {'recipe': recipe})
 
+@login_required
 def recipe_create(request):
     """Vista para crear una nueva receta."""
     if request.method == 'POST':
@@ -55,9 +58,14 @@ def recipe_create(request):
         form = RecipeForm()
     return render(request, 'recipe-create.html', {'form': form})
 
+@login_required
 def recipe_update(request, pk):
     """Vista para editar una receta existente."""
     recipe = get_object_or_404(Recipe, pk=pk)
+
+    # Verifica si el usuario actual es el autor de la receta
+    if recipe.author != request.user:
+        return redirect('recipe-detail', pk=recipe.pk)  # O muestra un mensaje de error
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
@@ -102,9 +110,14 @@ def recipe_update(request, pk):
 
     return render(request, 'recipe-update.html', {'form': form, 'recipe': recipe})
 
+@login_required
 def recipe_delete(request, pk):
     """Vista para eliminar una receta."""
     recipe = get_object_or_404(Recipe, pk=pk)
+
+    # Verifica si el usuario actual es el autor de la receta
+    if recipe.author != request.user:
+        return redirect('recipe-detail', pk=recipe.pk)  # O muestra un mensaje de error
 
     if request.method == 'POST':
         recipe.delete()

@@ -13,6 +13,18 @@
         <h1>
             <a href="{% url 'recipes-list' %}">CookBook</a>
         </h1>
+        {% if user.is_authenticated %}
+        <p>Bienvenido, {{ user.username }}! <a href="{% url 'account_logout' %}">Cerrar Sesión</a></p>
+        {% else %}
+        <p><a href="{% url 'account_login' %}">Iniciar Sesión</a> | <a href="{% url 'account_signup' %}">Registrarse</a></p>
+        {% endif %}
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </header>
     <div>
         {% block content %}
