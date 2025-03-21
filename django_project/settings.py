@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',  # Para Google
+    'allauth.socialaccount.providers.facebook', # Para Facebook
 ]
 
 MIDDLEWARE = [
@@ -149,3 +151,15 @@ ACCOUNT_LOGIN_METHODS = ['username', 'email']
 ACCOUNT_EMAIL_VERIFICATION = "none" 
 LOGIN_REDIRECT_URL = '/recipes/' 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+
+ACCOUNT_LOGIN_TEMPLATE = os.path.join('account', 'login.html')
+ACCOUNT_SIGNUP_TEMPLATE = os.path.join('account', 'signup.html')
+ACCOUNT_LOGOUT_TEMPLATE = os.path.join('account', 'logout.html')
+ACCOUNT_PASSWORD_RESET_TEMPLATE = os.path.join('account', 'password_reset.html')
+ACCOUNT_PASSWORD_RESET_DONE_TEMPLATE = os.path.join('account', 'password_reset_done.html')
+ACCOUNT_PASSWORD_RESET_FROM_KEY_TEMPLATE = os.path.join('account', 'password_reset_from_key.html')
+ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = os.path.join('account', 'password_reset_from_key_done.html')
+ACCOUNT_PASSWORD_SET_TEMPLATE = os.path.join('account', 'password_set.html')
+ACCOUNT_EMAIL_TEMPLATE = os.path.join('account', 'email.html')
+SOCIALACCOUNT_ENABLED = True
+
