@@ -65,3 +65,11 @@ class Step(models.Model):
 
     def __str__(self):
         return f'{self.recipe.title} - Paso {self.step_number}'
+    
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True, default="profile_pics/default.jpg")
+    favorite_recipes = models.ManyToManyField('Recipe', related_name='favorited_by', blank=True)
+
+    def __str__(self):
+        return self.user.username

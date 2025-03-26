@@ -1,0 +1,43 @@
+{% extends '__base.html' %}
+
+{% block content %}
+<h1>Perfil de {{ user_profile.user.username }}</h1>
+
+{% if user_profile.profile_picture %}
+<img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil" style="max-width: 200px;">
+{% else %}
+<p>No hay foto de perfil.</p>
+{% endif %}
+
+<h2>Recetas Creadas</h2>
+{% if created_recipes %}
+<div class="recipe-grid">
+    {% for recipe in created_recipes %}
+    <div class="recipe-item">
+        {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+        {% endif %}
+        <a href="{% url 'recipe-detail' pk=recipe.pk %}">{{ recipe.title }}</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No hay recetas creadas.</p>
+{% endif %}
+
+<h2>Recetas Favoritas</h2>
+{% if favorite_recipes %}
+<div class="recipe-grid">
+    {% for recipe in favorite_recipes %}
+    <div class="recipe-item">
+        {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+        {% endif %}
+        <a href="{% url 'recipe-detail' pk=recipe.pk %}">{{ recipe.title }}</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No hay recetas favoritas.</p>
+{% endif %}
+{% endblock %}

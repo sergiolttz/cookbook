@@ -32,7 +32,9 @@
     <p><strong>Descripción:</strong> {{ recipe.description }}</p>
     <p><strong>Tiempo requerido:</strong> {{ recipe.time_required }}</p>
     <p><strong>Porciones:</strong> {{ recipe.servings }}</p>
-    <p><strong>Autor:</strong> {{ recipe.author.username }}</p>
+    <p><strong>Autor:</strong> {{ recipe.author.username }}
+        <a href="{% url 'user_profile' username=recipe.author.username %}">Ver Perfil</a>
+    </p>
 
     <h3>Ingredientes:</h3>
     <ul>
@@ -47,7 +49,19 @@
         <li>{{ step.description }}</li>
         {% endfor %}
     </ol>
-
+    {% if user.is_authenticated %}
+    {% if recipe in user.profile.favorite_recipes.all %}
+    <form method="post" action="{% url 'remove_favorite' recipe.id %}">
+        {% csrf_token %}
+        <button type="submit">Quitar de Favoritos</button>
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'add_favorite' recipe.id %}">
+        {% csrf_token %}
+        <button type="submit">Añadir a Favoritos</button>
+    </form>
+    {% endif %}
+    {% endif %}
     <button id="copy-link">Copiar Enlace</button>
     <input type="text" id="recipe-link" value="{{ request.build_absolute_uri }}" readonly style="display: none;">
     <a href="{% url 'recipe-pdf' pk=recipe.pk %}" class="btn btn-primary">Descargar PDF</a>

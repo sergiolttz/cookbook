@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import RecipeForm, RatingForm 
-from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating
+from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile
 import pdfkit
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
+from django.contrib.auth.models import User
 
 
 def recipe_list(request):
@@ -179,3 +180,33 @@ def recipe_pdf(request, pk):
     response['Content-Disposition'] = f'attachment; filename="{recipe.title}.pdf"'
 
     return response
+
+@login_required
+def user_profile(request, username):
+    """Vista para ver el perfil de usuario."""
+    user = get_object_or_404(User, username=username)
+    user_profile, created = UserProfile.objects.get_or_create(user=user)
+    created_recipes = Recipe.objects.filter(author=user)
+    favorite_recipes = user_profile.favorite_recipes.all()
+
+    context = {
+        'user_profile': user_profile,
+        'created_recipes': created_recipes,
+        'favorite_recipes': favorite_recipes,
+    }
+
+    return render(request, 'user_profile.html', context)
+
+@login_required
+def add_favorite(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    user_profile.favorite_recipes.add(recipe)
+    return redirect('recipe-detail', pk=recipe.pk)
+
+@login_required
+def remove_favorite(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    user_profile.favorite_recipes.remove(recipe)
+    return redirect('recipe-detail', pk=recipe.pk)
