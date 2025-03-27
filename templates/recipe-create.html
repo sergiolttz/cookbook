@@ -6,50 +6,39 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    {{ form.title.label_tag }} {{ form.title }}
-    {{ form.description.label_tag }} {{ form.description }}
-    {{ form.image.label_tag }} {{ form.image }}
-    {{ form.time_required.label_tag }} {{ form.time_required }}
-    {{ form.servings.label_tag }} {{ form.servings }}
-    {{ form.calification.label_tag }} {{ form.calification }}
+    {{ form.as_p }}
 
-    <h3>Agregar Ingrediente</h3>
+    <h3>Agregar Ingredientes</h3>
     <div id="ingredients-container">
         <div class="ingredient-row">
             <label for="ingredient_name">Nombre Ingrediente</label>
-            <input type="text" name="ingredient_name" id="ingredient_name_0">
+            <input type="text" name="ingredient_name">
             <label for="ingredient_quantity">Cantidad</label>
-            <input type="text" name="ingredient_quantity" id="ingredient_quantity_0"
+            <input type="text" name="ingredient_quantity"
                 oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
             <label for="ingredient_measurement">Medida</label>
-            <select name="ingredient_measurement" id="ingredient_measurement_0">
-                <option value="gr">Gramos</option>
-                <option value="kg">Kilogramos</option>
-                <option value="ml">Mililitros</option>
-                <option value="l">Litros</option>
-                <option value="tz">Taza</option>
-                <option value="cdta">Cucharadita</option>
-                <option value="cda">Cucharada</option>
-                <option value="u">Unidad</option>
+            <select name="ingredient_measurement">
+                {% for value, label in ingredient_form.fields.ingredient_measurement.choices %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
             </select>
             <button type="button" class="remove-ingredient">Eliminar</button>
         </div>
     </div>
     <button type="button" id="add-ingredient">Agregar Ingrediente</button>
-    
+
     <h3>Pasos a Seguir</h3>
     <div id="steps-container">
         <div class="step-row">
             <label for="step_description">Paso 1:</label>
-            <textarea name="step_description" id="step_description_0"></textarea>
+            <textarea name="step_description"></textarea>
             <button type="button" class="remove-step">Eliminar</button>
         </div>
     </div>
     <button type="button" id="add-step">Agregar Paso</button>
-    
-    <button type="submit">Guardar Receta</button>
 
-</form> 
+    <button type="submit">Guardar Receta</button>
+</form>
 
 <a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
 
@@ -66,17 +55,12 @@
                 <label for="ingredient_name">Nombre Ingrediente</label>
                 <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
                 <label for="ingredient_quantity">Cantidad</label>
-                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" onchange="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
                 <label for="ingredient_measurement">Medida</label>
                 <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
-                    <option value="gr">Gramos</option>
-                    <option value="kg">Kilogramos</option>
-                    <option value="ml">Mililitros</option>
-                    <option value="l">Litros</option>
-                    <option value="tz">Taza</option>
-                    <option value="cdta">Cucharadita</option>
-                    <option value="cda">Cucharada</option>
-                    <option value="u">Unidad</option>
+                    {% for value, label in form.fields.ingredient_measurement.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
                 </select>
                 <button type="button" class="remove-ingredient">Eliminar</button>
             `;
@@ -90,7 +74,8 @@
         ingredientsContainer.querySelector('.remove-ingredient').addEventListener('click', function () {
             this.parentElement.remove();
         });
-                const stepsContainer = document.getElementById('steps-container');
+
+        const stepsContainer = document.getElementById('steps-container');
         const addStepButton = document.getElementById('add-step');
         let stepCount = 1;
 

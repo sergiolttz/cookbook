@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import RecipeForm, RatingForm, UserProfileForm
+from .forms import RecipeForm, RecipeForm, IngredientForm, RatingForm, UserProfileForm
 from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile
 import pdfkit
 from django.http import HttpResponse
@@ -62,26 +62,7 @@ def recipe_create(request):
             recipe.author = request.user
             recipe.save()
 
-            # Manejar la creación de múltiples ingredientes
-            ingredient_names = request.POST.getlist('ingredient_name')
-            ingredient_quantities = request.POST.getlist('ingredient_quantity')
-            ingredient_measurements = request.POST.getlist('ingredient_measurement')
-
-            for i in range(len(ingredient_names)):
-                ingredient_name = ingredient_names[i]
-                ingredient_quantity = ingredient_quantities[i]
-                ingredient_measurement = ingredient_measurements[i]
-
-                if ingredient_name and ingredient_quantity and ingredient_measurement:
-                    ingredient, created = Ingredient.objects.get_or_create(name=ingredient_name)
-                    RecipeIngredient.objects.create(
-                        recipe=recipe,
-                        ingredient=ingredient,
-                        quantity=ingredient_quantity,
-                        measurement=ingredient_measurement
-                    )
-
-            # Manejar la creación de pasos
+            # Manejar pasos
             step_descriptions = request.POST.getlist('step_description')
 
             for i, description in enumerate(step_descriptions):
@@ -91,7 +72,7 @@ def recipe_create(request):
             return redirect('recipe-detail', pk=recipe.pk)
     else:
         form = RecipeForm()
-    return render(request, 'recipe-create.html', {'form': form})
+    return render(request, 'recipe-create.html', {'form': form, 'ingredient_form': IngredientForm()})
 
 @login_required
 def recipe_update(request, pk):
@@ -106,7 +87,7 @@ def recipe_update(request, pk):
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
         if form.is_valid():
             recipe = form.save()
-
+            
             # Manejar la actualización de ingredientes
             ingredient_names = request.POST.getlist('ingredient_name')
             ingredient_quantities = request.POST.getlist('ingredient_quantity')

@@ -67,7 +67,7 @@
 
     <button type="submit">Guardar Cambios</button>
 </form>
-
+<a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
 <a href="{% url 'recipe-detail' pk=recipe.pk %}">Volver a la receta</a>
 
 <script>
