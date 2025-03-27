@@ -8,12 +8,18 @@
 {% else %}
 <p>No hay foto de perfil.</p>
 {% endif %}
+
+<p><strong>Nombre:</strong> {{ user_profile.first_name|default:"No especificado" }}</p>
+<p><strong>Apellido:</strong> {{ user_profile.last_name|default:"No especificado" }}</p>
+<p><strong>País:</strong> {{ user_profile.country|default:"No especificado" }}</p>
+<p><strong>Se unió el:</strong> {{ user_profile.user.date_joined|date:"d/m/Y" }}</p>
+<p><strong>Recetas subidas:</strong> {{ created_recipes|length }}</p>
+
 {% if user_profile.user == user %}
 <a href="{% url 'edit_profile' %}">Editar Perfil</a>
 {% endif %}
 
 <h2>Recetas Creadas</h2>
-{% if created_recipes %}
 <div class="recipe-grid">
     {% for recipe in created_recipes %}
     <div class="recipe-item">
@@ -24,12 +30,8 @@
     </div>
     {% endfor %}
 </div>
-{% else %}
-<p>No hay recetas creadas.</p>
-{% endif %}
 
 <h2>Recetas Favoritas</h2>
-{% if favorite_recipes %}
 <div class="recipe-grid">
     {% for recipe in favorite_recipes %}
     <div class="recipe-item">
@@ -40,7 +42,4 @@
     </div>
     {% endfor %}
 </div>
-{% else %}
-<p>No hay recetas favoritas.</p>
-{% endif %}
 {% endblock %}

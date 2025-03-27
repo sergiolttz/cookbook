@@ -225,3 +225,21 @@ def edit_profile(request):
     else:
         form = UserProfileForm(instance=user_profile)
     return render(request, 'edit_profile.html', {'form': form})
+
+@login_required
+def deactivate_account(request):
+    """Vista para desactivar la cuenta del usuario."""
+    if request.method == 'POST':
+        user = request.user
+        user.is_active = False
+        user.save()
+
+        """Desactiva las recetas subidas por el usuario."""
+        Recipe.objects.filter(author=user).update(is_active=False)
+
+        """Cierra la sesión del usuario."""
+        from django.contrib.auth import logout
+        logout(request)
+
+        return redirect('recipes-list')
+    return redirect('edit_profile')
