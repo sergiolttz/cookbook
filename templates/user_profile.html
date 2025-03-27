@@ -8,6 +8,9 @@
 {% else %}
 <p>No hay foto de perfil.</p>
 {% endif %}
+{% if user_profile.user == user %}
+<a href="{% url 'edit_profile' %}">Editar Perfil</a>
+{% endif %}
 
 <h2>Recetas Creadas</h2>
 {% if created_recipes %}

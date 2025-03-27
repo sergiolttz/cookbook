@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import RecipeForm, RatingForm 
+from .forms import RecipeForm, RatingForm, UserProfileForm
 from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile
 import pdfkit
 from django.http import HttpResponse
@@ -181,7 +181,7 @@ def recipe_pdf(request, pk):
 
     return response
 
-@login_required
+
 def user_profile(request, username):
     """Vista para ver el perfil de usuario."""
     user = get_object_or_404(User, username=username)
@@ -199,6 +199,7 @@ def user_profile(request, username):
 
 @login_required
 def add_favorite(request, recipe_id):
+    """Vista para agregar una receta a favoritos."""
     recipe = get_object_or_404(Recipe, id=recipe_id)
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     user_profile.favorite_recipes.add(recipe)
@@ -206,7 +207,21 @@ def add_favorite(request, recipe_id):
 
 @login_required
 def remove_favorite(request, recipe_id):
+    """Vista para eliminar una receta de favoritos."""
     recipe = get_object_or_404(Recipe, id=recipe_id)
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     user_profile.favorite_recipes.remove(recipe)
     return redirect('recipe-detail', pk=recipe.pk)
+
+@login_required
+def edit_profile(request):
+    """Vista para editar el perfil del usuario."""
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile', username=request.user.username)
+    else:
+        form = UserProfileForm(instance=user_profile)
+    return render(request, 'edit_profile.html', {'form': form})

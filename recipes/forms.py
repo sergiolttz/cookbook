@@ -1,6 +1,7 @@
 from django import forms
-from .models import Recipe, Ingredient, RecipeIngredient, Rating
+from .models import Recipe, RecipeIngredient, Rating, UserProfile
 from .widgets import RecipeDurationWidget
+
 
 class RatingForm(forms.ModelForm):
     class Meta:
@@ -28,3 +29,8 @@ class RecipeIngredientForm(forms.ModelForm):
     class Meta:
         model = RecipeIngredient
         fields = ['ingredient', 'quantity', 'measurement']
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture'] 
