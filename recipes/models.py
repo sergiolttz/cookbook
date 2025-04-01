@@ -7,6 +7,13 @@ class Ingredient(models.Model):
     def __str__(self):
         return self.name
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    tag_type = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 class Recipe(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -17,9 +24,11 @@ class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    tags = models.ManyToManyField(Tag, blank=True) 
 
     def __str__(self):
         return self.title
+
 
 class Rating(models.Model):
     RATING_CHOICES = [
