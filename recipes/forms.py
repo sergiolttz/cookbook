@@ -1,7 +1,8 @@
 from django import forms
 from .models import Recipe, RecipeIngredient, Rating, UserProfile
 from .widgets import RecipeDurationWidget
-
+import datetime
+""" antes
 class RecipeForm(forms.ModelForm):
     time_required = forms.DurationField(widget=RecipeDurationWidget())
 
@@ -14,6 +15,22 @@ class RecipeForm(forms.ModelForm):
         time_required = self.cleaned_data['time_required']
         if time_required is not None:
             return time_required
+        else:
+            return None"""
+
+class RecipeForm(forms.ModelForm):
+    time_required = forms.DurationField(widget=RecipeDurationWidget())
+
+    class Meta:
+        model = Recipe
+        fields = ['title', 'description', 'image', 'time_required', 'servings']
+        exclude = ['ingredients'] #Mantener solo esta definición, que excluye ingredients
+
+    def clean_time_required(self):
+        time_required = self.cleaned_data['time_required']
+        if time_required is not None:
+            # Convierte microsegundos a timedelta
+            return datetime.timedelta(microseconds=time_required.total_seconds() * 1000000)
         else:
             return None
 

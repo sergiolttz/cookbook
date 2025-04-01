@@ -1,38 +1,41 @@
 {% extends '__base.html' %}
-
 {% block content %}
-<h2>Lista de Recetas</h2>
+<h1>Lista de Recetas</h1>
 
-<a href="{% url 'recipe-create' %}">Crear Nueva Receta</a>
+<form method="get">
+    <input type="text" name="q" placeholder="Buscar recetas..." value="{% if query %}{{ query }}{% endif %}">
+    <button type="submit">Buscar</button>
 
-{% for item in recipe_ratings %}
-<div>
-    <h3>
-        <a href="{% url 'recipe-detail' item.recipe.pk %}">{{ item.recipe.title }}</a>
-    </h3>
+    <label for="sort">Ordenar por:</label>
+    <select name="sort" id="sort">
+        <option value="">Ninguno</option>
+        <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
+        <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración</option>
+        <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>Ingredientes</option>
+    </select>
 
-    {% if item.recipe.image %}
-    <a href="{% url 'recipe-detail' item.recipe.pk %}">
-        <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}" style="max-width: 200px;">
-    </a>
-    {% endif %}
+    <label for="order">Orden:</label>
+    <select name="order" id="order">
+        <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
+        <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
+    </select>
 
-    <p>{{ item.recipe.description }}</p>
-    <p>Tiempo requerido: {{ item.recipe.time_required }}</p>
-    <p>Porciones: {{ item.recipe.servings }}</p>
+    <button type="submit">Filtrar/Ordenar</button>
+</form>
 
-    {% if item.average_rating %}
-    <p>Calificación: {{ item.average_rating|floatformat:1 }}</p>
-    {% else %}
-    <p>Calificación: Sin calificar</p>
-    {% endif %}
-
-    {% with ingredients_count=item.recipe.ingredients.count %}
-    <p>{{ ingredients_count }} ingredientes</p>
-    {% endwith %}
-
-    <a href="{% url 'recipe-detail' item.recipe.pk %}">Ver detalles</a>
+<div class="recipe-list">
+    {% for item in recipes_with_ratings %}
+    <div class="recipe-card">
+        <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
+            <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
+            <h3>{{ item.recipe.title }}</h3>
+            <p>Tiempo: {{ item.recipe.time_required }}</p>
+            <p>Rating: {% if item.avg_rating %}{{ item.avg_rating|floatformat:1 }}{% else %}Sin calificar{% endif %}</p>
+            <p>Ingredientes: {{ item.recipe.recipeingredient_set.count }}</p>
+        </a>
+    </div>
+    {% empty %}
+    <p>No se encontraron recetas.</p>
+    {% endfor %}
 </div>
-{% endfor %}
-
-{% endblock content %}
+{% endblock %}

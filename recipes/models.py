@@ -15,6 +15,7 @@ class Recipe(models.Model):
     time_required = models.DurationField()
     servings = models.PositiveIntegerField(default=1)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

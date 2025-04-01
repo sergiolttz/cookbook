@@ -11,7 +11,7 @@
 
     <header>
         <h1>
-            <a href="{% url 'recipes-list' %}">CookBook</a>
+            <a href="{% url 'home' %}">CookBook</a>
         </h1>
         {% if user.is_authenticated %}
         <p>Bienvenido, {{ user.username }}!</p>

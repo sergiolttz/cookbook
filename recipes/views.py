@@ -5,20 +5,91 @@ import pdfkit
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Q, Avg, Count
 from django.contrib.auth.models import User
+import datetime
 
+
+def home(request):
+    """Vista para la página de inicio."""
+    query = request.GET.get('q')  # Obtener la consulta de búsqueda
+
+    if query:
+        # Si hay una consulta, filtrar las recetas por título o descripción
+        recipes = Recipe.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+    else:
+        # Si no hay consulta, obtener todas las recetas
+        recipes = Recipe.objects.all()
+
+    quick_recipes = []
+    for recipe in recipes:
+        if recipe.time_required is not None:
+            # Convierte microsegundos a timedelta
+            td = datetime.timedelta(microseconds=recipe.time_required.total_seconds() * 1000000)
+            if td <= datetime.timedelta(minutes=12):
+                quick_recipes.append(recipe)
+
+    few_ingredients_recipes = [recipe for recipe in recipes if recipe.recipeingredient_set.count() < 3]
+
+    favorite_recipes = []
+    if request.user.is_authenticated:
+        favorite_recipes = request.user.profile.favorite_recipes.all()
+
+    latest_recipes = Recipe.objects.order_by('-created_at')[:3]  # Obtiene las 3 últimas recetas
+
+    return render(request, 'home.html', {
+        'recipes': recipes,
+        'quick_recipes': quick_recipes[:3],  # Muestra solo las primeras 3 recetas rápidas
+        'few_ingredients_recipes': few_ingredients_recipes[:3],  # Muestra solo las primeras 3 recetas con pocos ingredientes
+        'favorite_recipes': favorite_recipes,
+        'latest_recipes': latest_recipes,  # Muestra las 3 últimas recetas
+        'has_more_quick_recipes': len(quick_recipes) > 3,  # Indica si hay más recetas rápidas
+        'has_more_few_ingredients_recipes': len(few_ingredients_recipes) > 3,  # Indica si hay más recetas con pocos ingredientes
+    })
 
 def recipe_list(request):
-    """Vista para mostrar la lista de recetas. """
-    recipe_list = Recipe.objects.all() 
-    recipe_ratings = []
-    for recipe in recipe_list:
-        ratings = Rating.objects.filter(recipe=recipe)
-        average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
-        recipe_ratings.append({'recipe': recipe, 'average_rating': average_rating})
+    """Vista para mostrar la lista de recetas con búsqueda y ordenamiento."""
+    query = request.GET.get('q')  # Obtener la consulta de búsqueda
+    sort_by = request.GET.get('sort')  # Obtener el parámetro de ordenamiento
+    order = request.GET.get('order', 'asc')  # Obtener el parámetro de ordenamiento (ascendente/descendente)
 
-    return render(request, 'recipes-list.html', {'recipe_ratings': recipe_ratings})
+    recipes = Recipe.objects.all()
+
+    if query:
+        recipes = recipes.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+
+    if sort_by == 'rating':
+        if order == 'asc':
+            recipes = recipes.annotate(avg_rating=Avg('rating__rating')).order_by('avg_rating')
+        else:
+            recipes = recipes.annotate(avg_rating=Avg('rating__rating')).order_by('-avg_rating')
+    elif sort_by == 'duration':
+        if order == 'asc':
+            recipes = recipes.order_by('time_required')
+        else:
+            recipes = recipes.order_by('-time_required')
+    elif sort_by == 'ingredients':
+        if order == 'asc':
+            recipes = recipes.annotate(ingredient_count=Count('recipeingredient')).order_by('ingredient_count')
+        else:
+            recipes = recipes.annotate(ingredient_count=Count('recipeingredient')).order_by('-ingredient_count')
+
+    # Calcula la calificación promedio para cada receta
+    recipes_with_ratings = []
+    for recipe in recipes:
+        avg_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg']
+        recipes_with_ratings.append({'recipe': recipe, 'avg_rating': avg_rating})
+
+    return render(request, 'recipes-list.html', {
+        'recipes_with_ratings': recipes_with_ratings,
+        'query': query,
+        'sort_by': sort_by,
+        'order': order,
+    })
 
 def recipe_detail(request, pk):
     """Vista para mostrar el detalle de una receta y manejar las calificaciones."""
@@ -176,7 +247,7 @@ def user_profile(request, username):
         'favorite_recipes': favorite_recipes,
     }
 
-    return render(request, 'user_profile.html', context)
+    return render(request, 'user-profile.html', context)
 
 @login_required
 def add_favorite(request, recipe_id):
@@ -205,7 +276,7 @@ def edit_profile(request):
             return redirect('user_profile', username=request.user.username)
     else:
         form = UserProfileForm(instance=user_profile)
-    return render(request, 'edit_profile.html', {'form': form})
+    return render(request, 'edit-profile.html', {'form': form})
 
 @login_required
 def deactivate_account(request):
