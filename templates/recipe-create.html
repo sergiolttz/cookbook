@@ -1,104 +1,99 @@
 {% extends '__base.html' %}
-
 {% block content %}
-<h2>Crear Nueva Receta</h2>
+<h1>Crear Receta</h1>
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-
     {{ form.as_p }}
 
-    <h3>Agregar Ingredientes</h3>
-    <div id="ingredients-container">
-        <div class="ingredient-row">
-            <label for="ingredient_name">Nombre Ingrediente</label>
-            <input type="text" name="ingredient_name">
-            <label for="ingredient_quantity">Cantidad</label>
-            <input type="text" name="ingredient_quantity"
-                oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
-            <label for="ingredient_measurement">Medida</label>
-            <select name="ingredient_measurement">
-                {% for value, label in ingredient_form.fields.ingredient_measurement.choices %}
-                <option value="{{ value }}">{{ label }}</option>
-                {% endfor %}
-            </select>
-            <button type="button" class="remove-ingredient">Eliminar</button>
+    <h2>Ingredientes</h2>
+    <div id="ingredient-formset-container">
+        {{ ingredient_formset.management_form }}
+        {% for ingredient_form in ingredient_formset %}
+        <div class="ingredient-form">
+            {{ ingredient_form.as_p }}
+            <button type="button" class="remove-ingredient">Eliminar Ingrediente</button>
         </div>
+        {% endfor %}
     </div>
     <button type="button" id="add-ingredient">Agregar Ingrediente</button>
 
-    <h3>Pasos a Seguir</h3>
-    <div id="steps-container">
-        <div class="step-row">
-            <label for="step_description">Paso 1:</label>
-            <textarea name="step_description"></textarea>
-            <button type="button" class="remove-step">Eliminar</button>
+    <h2>Pasos</h2>
+    <div id="step-formset-container">
+        {{ step_formset.management_form }}
+        {% for step_form in step_formset %}
+        <div class="step-form">
+            {{ step_form.as_p }}
+            <button type="button" class="remove-step">Eliminar Paso</button>
         </div>
+        {% endfor %}
     </div>
     <button type="button" id="add-step">Agregar Paso</button>
 
     <button type="submit">Guardar Receta</button>
+    <a href="{% url 'recipes-list' %}"><button type="button">Cancelar</button></a>
 </form>
 
-<a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ingredientsContainer = document.getElementById('ingredients-container');
-        const addIngredientButton = document.getElementById('add-ingredient');
+    // Agregar un nuevo formulario de ingrediente al hacer clic en el botón
+    const addIngredientButton = document.getElementById('add-ingredient');
+    const ingredientFormsetContainer = document.getElementById('ingredient-formset-container');
+    const ingredientFormsetPrefix = '{{ ingredient_formset.prefix }}';
+    let ingredientFormCount = parseInt('{{ ingredient_formset.total_form_count }}');
+    const ingredientEmptyFormHtml = `{{ ingredient_empty_form_html|escapejs }}`.replace(/__prefix__/g, ingredientFormCount);
 
-        addIngredientButton.addEventListener('click', function () {
-            const timestamp = new Date().getTime();
-            const newRow = document.createElement('div');
-            newRow.classList.add('ingredient-row');
-            newRow.innerHTML = `
-                <label for="ingredient_name">Nombre Ingrediente</label>
-                <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
-                <label for="ingredient_quantity">Cantidad</label>
-                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
-                <label for="ingredient_measurement">Medida</label>
-                <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
-                    {% for value, label in form.fields.ingredient_measurement.choices %}
-                        <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" class="remove-ingredient">Eliminar</button>
-            `;
-            ingredientsContainer.appendChild(newRow);
+    addIngredientButton.addEventListener('click', function () {
+        const newForm = document.createElement('div');
+        newForm.innerHTML = ingredientEmptyFormHtml.replace(/__prefix__/g, ingredientFormCount);
+        ingredientFormsetContainer.appendChild(newForm);
+        ingredientFormCount++;
+        document.getElementById('id_ingredients-TOTAL_FORMS').value = ingredientFormCount;
 
-            newRow.querySelector('.remove-ingredient').addEventListener('click', function () {
-                newRow.remove();
-            });
-        });
+        // Agregar el botón de eliminar al nuevo formulario
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.textContent = 'Eliminar Ingrediente';
+        removeButton.classList.add('remove-ingredient');
+        newForm.appendChild(removeButton);
+    });
 
-        ingredientsContainer.querySelector('.remove-ingredient').addEventListener('click', function () {
-            this.parentElement.remove();
-        });
+    // Agregar un nuevo formulario de paso al hacer clic en el botón
+    const addStepButton = document.getElementById('add-step');
+    const stepFormsetContainer = document.getElementById('step-formset-container');
+    const stepFormsetPrefix = '{{ step_formset.prefix }}';
+    let stepFormCount = parseInt('{{ step_formset.total_form_count }}');
+    const stepEmptyFormHtml = `{{ step_empty_form_html|escapejs }}`.replace(/__prefix__/g, stepFormCount);
 
-        const stepsContainer = document.getElementById('steps-container');
-        const addStepButton = document.getElementById('add-step');
-        let stepCount = 1;
+    addStepButton.addEventListener('click', function () {
+        const newForm = document.createElement('div');
+        newForm.innerHTML = stepEmptyFormHtml.replace(/__prefix__/g, stepFormCount);
+        stepFormsetContainer.appendChild(newForm);
+        stepFormCount++;
+        document.getElementById('id_steps-TOTAL_FORMS').value = stepFormCount;
 
-        addStepButton.addEventListener('click', function () {
-            stepCount++;
-            const timestamp = new Date().getTime();
-            const newRow = document.createElement('div');
-            newRow.classList.add('step-row');
-            newRow.innerHTML = `
-                <label for="step_description">Paso ${stepCount}:</label>
-                <textarea name="step_description" id="step_description_${timestamp}"></textarea>
-                <button type="button" class="remove-step">Eliminar</button>
-            `;
-            stepsContainer.appendChild(newRow);
+        // Agregar el botón de eliminar al nuevo formulario
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.textContent = 'Eliminar Paso';
+        removeButton.classList.add('remove-step');
+        newForm.appendChild(removeButton);
+    });
 
-            newRow.querySelector('.remove-step').addEventListener('click', function () {
-                newRow.remove();
-            });
-        });
+    // Eliminar ingredientes y pasos al hacer clic en los botones de eliminar
+    ingredientFormsetContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-ingredient')) {
+            event.target.parentElement.remove();
+            ingredientFormCount--;
+            document.getElementById('id_ingredients-TOTAL_FORMS').value = ingredientFormCount;
+        }
+    });
 
-        stepsContainer.querySelector('.remove-step').addEventListener('click', function () {
-            this.parentElement.remove();
-        });
+    stepFormsetContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-step')) {
+            event.target.parentElement.remove();
+            stepFormCount--;
+            document.getElementById('id_steps-TOTAL_FORMS').value = stepFormCount;
+        }
     });
 </script>
-{% endblock content %}
+{% endblock %}

@@ -12,7 +12,6 @@
     {{ form.image.label_tag }} {{ form.image }}
     {{ form.time_required.label_tag }} {{ form.time_required }}
     {{ form.servings.label_tag }} {{ form.servings }}
-    {{ form.calification.label_tag }} {{ form.calification }}
 
     <h3>Agregar Ingrediente</h3>
     <div id="ingredients-container">
@@ -25,7 +24,7 @@
             <label for="ingredient_measurement">Medida</label>
             <select name="ingredient_measurement">
                 {% for option, display in ingredient.MEASUREMENT_CHOICES %}
-                <option value="{{ option }}" {% if option in ingredient.measurement|make_list %}selected{% endif %}>{{ display }}
+                <option value="{{ option }}" {% if option == ingredient.measurement %}selected{% endif %}>{{ display }}
                 </option>
                 {% endfor %}
             </select>
@@ -39,8 +38,8 @@
             <input type="text" name="ingredient_quantity">
             <label for="ingredient_measurement">Medida</label>
             <select name="ingredient_measurement">
-                {% for choice in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
-                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% for option, display in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
+                <option value="{{ option }}">{{ display }}</option>
                 {% endfor %}
             </select>
             <button type="button" class="remove-ingredient">Eliminar</button>
@@ -72,77 +71,54 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-            // Ingredientes
-            const ingredientsContainer = document.getElementById('ingredients-container');
-            const addIngredientButton = document.getElementById('add-ingredient');
+        // Ingredientes
+        const ingredientsContainer = document.getElementById('ingredients-container');
+        const addIngredientButton = document.getElementById('add-ingredient');
 
-            addIngredientButton.addEventListener('click', function () {
-                const timestamp = new Date().getTime();
-                const newRow = document.createElement('div');
-                newRow.classList.add('ingredient-row');
-                newRow.innerHTML = `
-            <label for="ingredient_name">Nombre Ingrediente</label>
-            <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
-            <label for="ingredient_quantity">Cantidad</label>
-            <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
-            <label for="ingredient_measurement">Medida</label>
-            <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
-                {% for choice in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
-                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                {% endfor %}
-            </select>
-            <button type="button" class="remove-ingredient">Eliminar</button>
-        `;
-                ingredientsContainer.appendChild(newRow);
+        addIngredientButton.addEventListener('click', function () {
+            const timestamp = new Date().getTime();
+            const newRow = document.createElement('div');
+            newRow.classList.add('ingredient-row');
+            newRow.innerHTML = `
+                <label for="ingredient_name">Nombre Ingrediente</label>
+                <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
+                <label for="ingredient_quantity">Cantidad</label>
+                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
+                <label for="ingredient_measurement">Medida</label>
+                <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
+                    {% for choice in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
+                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="remove-ingredient">Eliminar</button>
+            `;
+            ingredientsContainer.appendChild(newRow);
 
-                newRow.querySelector('.remove-ingredient').addEventListener('click', function () {
-                    newRow.remove();
-                });
-        
-                addStepButton.addEventListener('click', function () {
-                    const timestamp = new Date().getTime();
-                    const newRow = document.createElement('div');
-                    newRow.classList.add('step-row');
-                    newRow.innerHTML = `
-                    <label for="step_description">Paso ${stepCount}:</label>
-                    <textarea name="step_description" id="step_description_${timestamp}"></textarea>
-                    <button type="button" class="remove-step">Eliminar</button>
-                `;
-                    stepsContainer.appendChild(newRow);
-        
-                    newRow.querySelector('.remove-step').addEventListener('click', function () {
-                        newRow.remove();
-                    });
-                    stepCount++;
-                });
-        
-                stepsContainer.querySelectorAll('.remove-step').forEach(button => {
-                    button.addEventListener('click', function () {
-                        this.parentElement.remove();
-                });
+            newRow.querySelector('.remove-ingredient').addEventListener('click', function () {
+                newRow.remove();
             });
-
-            ingredientsContainer.querySelectorAll('.remove-ingredient').forEach(button => {
-                button.addEventListener('click', function () {
-                    this.parentElement.remove();
-                });
-            });
-
-            // Pasos
-            const stepsContainer = document.getElementById('steps-container');
-            const addStepButton = document.getElementById('add-step');
-            let stepCount = parseInt("{{ recipe.steps.count|add:1 }}", 10);
         });
+
+        ingredientsContainer.querySelectorAll('.remove-ingredient').forEach(button => {
+            button.addEventListener('click', function () {
+                this.parentElement.remove();
+            });
+        });
+
+        // Pasos
+        const stepsContainer = document.getElementById('steps-container');
+        const addStepButton = document.getElementById('add-step');
+        let stepCount = parseInt("{{ recipe.steps.count|add:1 }}", 10);
 
         addStepButton.addEventListener('click', function () {
             const timestamp = new Date().getTime();
             const newRow = document.createElement('div');
             newRow.classList.add('step-row');
             newRow.innerHTML = `
-            <label for="step_description">Paso ${stepCount}:</label>
-            <textarea name="step_description" id="step_description_${timestamp}"></textarea>
-            <button type="button" class="remove-step">Eliminar</button>
-        `;
+                <label for="step_description">Paso ${stepCount}:</label>
+                <textarea name="step_description" id="step_description_${timestamp}"></textarea>
+                <button type="button" class="remove-step">Eliminar</button>
+            `;
             stepsContainer.appendChild(newRow);
 
             newRow.querySelector('.remove-step').addEventListener('click', function () {
@@ -156,6 +132,6 @@
                 this.parentElement.remove();
             });
         });
-});
+    });
 </script>
 {% endblock content %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import RecipeForm, RecipeForm, IngredientForm, RatingForm, UserProfileForm
+from .forms import RecipeForm, RecipeForm, IngredientForm, RecipeIngredientForm, StepForm, RatingForm, UserProfileForm
 from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile
 import pdfkit
 from django.http import HttpResponse
@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg, Count
 from django.contrib.auth.models import User
 import datetime
+from django.forms import formset_factory, inlineformset_factory
+from django import template
+
 
 
 def home(request):
@@ -126,24 +129,64 @@ def recipe_detail(request, pk):
 @login_required
 def recipe_create(request):
     """Vista para crear una nueva receta."""
+    IngredientFormSet = formset_factory(IngredientForm, extra=1)
+    StepFormSet = formset_factory(StepForm, extra=1)
+
     if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES)
-        if form.is_valid():
+        form = RecipeForm(request.POST, request.FILES)  # Inicializar form aquí
+        ingredient_formset = IngredientFormSet(request.POST, prefix='ingredients')
+        step_formset = StepFormSet(request.POST, prefix='steps')
+
+        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
 
-            # Manejar pasos
-            step_descriptions = request.POST.getlist('step_description')
+            # Guardar ingredientes
+            for ingredient_form in ingredient_formset:
+                if ingredient_form.cleaned_data and ingredient_form.cleaned_data.get('ingredient_name'):
+                    ingredient, created = Ingredient.objects.get_or_create(name=ingredient_form.cleaned_data['ingredient_name'])
+                    RecipeIngredient.objects.create(
+                        recipe=recipe,
+                        ingredient=ingredient,
+                        quantity=ingredient_form.cleaned_data['ingredient_quantity'],
+                        measurement=ingredient_form.cleaned_data['ingredient_measurement']
+                    )
 
-            for i, description in enumerate(step_descriptions):
-                if description:
-                    Step.objects.create(recipe=recipe, step_number=i + 1, description=description)
+            # Guardar pasos
+            step_number = 1  # Inicializar el número de paso
+            for step_form in step_formset:
+                if step_form.cleaned_data and step_form.cleaned_data.get('step_description'):
+                    Step.objects.create(
+                        recipe=recipe,
+                        step_number=step_number,
+                        description=step_form.cleaned_data['step_description']
+                    )
+                    step_number += 1  # Incrementar el número de paso
 
             return redirect('recipe-detail', pk=recipe.pk)
     else:
-        form = RecipeForm()
-    return render(request, 'recipe-create.html', {'form': form, 'ingredient_form': IngredientForm()})
+        form = RecipeForm() # Inicializar form aquí tambien
+        ingredient_formset = IngredientFormSet(prefix='ingredients')
+        step_formset = StepFormSet(prefix='steps')
+
+        # Renderizar los formularios vacíos como HTML
+        ingredient_empty_form_html = ingredient_formset.empty_form.as_p
+        step_empty_form_html = step_formset.empty_form.as_p
+
+    return render(request, 'recipe-create.html', {
+        'form': form,
+        'ingredient_formset': ingredient_formset,
+        'step_formset': step_formset,
+        'ingredient_empty_form_html': ingredient_empty_form_html,
+        'step_empty_form_html': step_empty_form_html,
+    })
+
+register = template.Library()
+
+@register.filter(name='modulo')
+def modulo(value, arg):
+    return value % arg
 
 @login_required
 def recipe_update(request, pk):
@@ -152,45 +195,12 @@ def recipe_update(request, pk):
 
     # Verifica si el usuario actual es el autor de la receta
     if recipe.author != request.user:
-        return redirect('recipe-detail', pk=recipe.pk)  # O muestra un mensaje de error
+        return redirect('recipe-detail', pk=recipe.pk)
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
         if form.is_valid():
-            recipe = form.save()
-            
-            # Manejar la actualización de ingredientes
-            ingredient_names = request.POST.getlist('ingredient_name')
-            ingredient_quantities = request.POST.getlist('ingredient_quantity')
-            ingredient_measurements = request.POST.getlist('ingredient_measurement')
-
-            # Eliminar ingredientes existentes
-            recipe.recipeingredient_set.all().delete()
-
-            for i in range(len(ingredient_names)):
-                ingredient_name = ingredient_names[i]
-                ingredient_quantity = ingredient_quantities[i]
-                ingredient_measurement = ingredient_measurements[i]
-
-                if ingredient_name and ingredient_quantity and ingredient_measurement:
-                    ingredient, created = Ingredient.objects.get_or_create(name=ingredient_name)
-                    RecipeIngredient.objects.create(
-                        recipe=recipe,
-                        ingredient=ingredient,
-                        quantity=ingredient_quantity,
-                        measurement=ingredient_measurement
-                    )
-
-            # Manejar la actualización de pasos
-            step_descriptions = request.POST.getlist('step_description')
-
-            # Eliminar pasos existentes
-            recipe.steps.all().delete()
-
-            for i, description in enumerate(step_descriptions):
-                if description:
-                    Step.objects.create(recipe=recipe, step_number=i + 1, description=description)
-
+            form.save()
             return redirect('recipe-detail', pk=recipe.pk)
     else:
         form = RecipeForm(instance=recipe)

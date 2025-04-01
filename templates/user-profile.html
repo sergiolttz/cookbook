@@ -21,6 +21,9 @@
 
 <h2>Recetas Creadas</h2>
 <div class="recipe-grid">
+    {% if user_profile.user == user %}
+    <a href="{% url 'recipe-create' %}">Crear Receta</a>
+    {% endif %}
     {% for recipe in created_recipes %}
     <div class="recipe-item">
         {% if recipe.image %}

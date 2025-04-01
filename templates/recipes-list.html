@@ -37,5 +37,8 @@
     {% empty %}
     <p>No se encontraron recetas.</p>
     {% endfor %}
+    {% if user.is_authenticated %}
+    <a href="{% url 'recipe-create' %}">Crear Receta</a>
+    {% endif %}
 </div>
 {% endblock %}
