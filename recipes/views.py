@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import RecipeForm, RecipeForm, IngredientForm, RecipeIngredientForm, StepForm, RatingForm, UserProfileForm
-from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile
+from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile, Tag
 import pdfkit
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -53,10 +53,11 @@ def home(request):
     })
 
 def recipe_list(request):
-    """Vista para mostrar la lista de recetas con búsqueda y ordenamiento."""
-    query = request.GET.get('q')  # Obtener la consulta de búsqueda
-    sort_by = request.GET.get('sort')  # Obtener el parámetro de ordenamiento
-    order = request.GET.get('order', 'asc')  # Obtener el parámetro de ordenamiento (ascendente/descendente)
+    """Vista para mostrar la lista de recetas con búsqueda, ordenamiento y filtro por etiquetas."""
+    query = request.GET.get('q')
+    sort_by = request.GET.get('sort')
+    order = request.GET.get('order', 'asc')
+    selected_tags = request.GET.getlist('tags')  # Obtener las etiquetas seleccionadas
 
     recipes = Recipe.objects.all()
 
@@ -64,6 +65,9 @@ def recipe_list(request):
         recipes = recipes.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
         )
+
+    if selected_tags:
+        recipes = recipes.filter(tags__in=selected_tags).distinct()
 
     if sort_by == 'rating':
         if order == 'asc':
@@ -87,11 +91,18 @@ def recipe_list(request):
         avg_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg']
         recipes_with_ratings.append({'recipe': recipe, 'avg_rating': avg_rating})
 
+    # Obtener tipos de etiquetas y etiquetas asociadas
+    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct()
+    all_tags = Tag.objects.all()  # Obtener todas las etiquetas
+
     return render(request, 'recipes-list.html', {
         'recipes_with_ratings': recipes_with_ratings,
         'query': query,
         'sort_by': sort_by,
         'order': order,
+        'tag_types': tag_types,
+        'all_tags': all_tags,  # Pasar todas las etiquetas al contexto
+        'selected_tags': selected_tags,
     })
 
 def recipe_detail(request, pk):
@@ -132,17 +143,20 @@ def recipe_create(request):
     IngredientFormSet = formset_factory(IngredientForm, extra=1)
     StepFormSet = formset_factory(StepForm, extra=1)
 
+    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct() #new
+
     if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES)  # Inicializar form aquí
+        form = RecipeForm(request.POST, request.FILES)
         ingredient_formset = IngredientFormSet(request.POST, prefix='ingredients')
         step_formset = StepFormSet(request.POST, prefix='steps')
+        selected_tags = request.POST.getlist('tags')  # Obtener etiquetas seleccionadas #new
 
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
 
-            # Guardar ingredientes
+            # Guardar ingredientes y pasos (como antes)
             for ingredient_form in ingredient_formset:
                 if ingredient_form.cleaned_data and ingredient_form.cleaned_data.get('ingredient_name'):
                     ingredient, created = Ingredient.objects.get_or_create(name=ingredient_form.cleaned_data['ingredient_name'])
@@ -153,8 +167,7 @@ def recipe_create(request):
                         measurement=ingredient_form.cleaned_data['ingredient_measurement']
                     )
 
-            # Guardar pasos
-            step_number = 1  # Inicializar el número de paso
+            step_number = 1
             for step_form in step_formset:
                 if step_form.cleaned_data and step_form.cleaned_data.get('step_description'):
                     Step.objects.create(
@@ -162,15 +175,17 @@ def recipe_create(request):
                         step_number=step_number,
                         description=step_form.cleaned_data['step_description']
                     )
-                    step_number += 1  # Incrementar el número de paso
+                    step_number += 1
+
+            # Guardar etiquetas seleccionadas
+            for tag_id in selected_tags:
+                recipe.tags.add(tag_id)
 
             return redirect('recipe-detail', pk=recipe.pk)
     else:
-        form = RecipeForm() # Inicializar form aquí tambien
+        form = RecipeForm()
         ingredient_formset = IngredientFormSet(prefix='ingredients')
         step_formset = StepFormSet(prefix='steps')
-
-        # Renderizar los formularios vacíos como HTML
         ingredient_empty_form_html = ingredient_formset.empty_form.as_p
         step_empty_form_html = step_formset.empty_form.as_p
 
@@ -180,6 +195,8 @@ def recipe_create(request):
         'step_formset': step_formset,
         'ingredient_empty_form_html': ingredient_empty_form_html,
         'step_empty_form_html': step_empty_form_html,
+        'tag_types': tag_types, #new
+        'all_tags': Tag.objects.all(), #new
     })
 
 register = template.Library()
@@ -193,19 +210,30 @@ def recipe_update(request, pk):
     """Vista para editar una receta existente."""
     recipe = get_object_or_404(Recipe, pk=pk)
 
-    # Verifica si el usuario actual es el autor de la receta
     if recipe.author != request.user:
         return redirect('recipe-detail', pk=recipe.pk)
 
+    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct() #new
+
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
+        selected_tags = request.POST.getlist('tags') #new
+
         if form.is_valid():
             form.save()
+            recipe.tags.clear()  # Limpiar etiquetas existentes #new
+            for tag_id in selected_tags: #new
+                recipe.tags.add(tag_id) #new
             return redirect('recipe-detail', pk=recipe.pk)
     else:
         form = RecipeForm(instance=recipe)
 
-    return render(request, 'recipe-update.html', {'form': form, 'recipe': recipe})
+    return render(request, 'recipe-update.html', {
+        'form': form,
+        'recipe': recipe,
+        'tag_types': tag_types,
+        'all_tags': Tag.objects.all(),
+    })
 
 @login_required
 def recipe_delete(request, pk):

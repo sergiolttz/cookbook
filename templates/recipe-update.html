@@ -1,5 +1,4 @@
 {% extends '__base.html' %}
-
 {% block content %}
 <h2>Editar Receta: {{ recipe.title }}</h2>
 <a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
@@ -7,11 +6,29 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    {{ form.title.label_tag }} {{ form.title }}
-    {{ form.description.label_tag }} {{ form.description }}
-    {{ form.image.label_tag }} {{ form.image }}
-    {{ form.time_required.label_tag }} {{ form.time_required }}
-    {{ form.servings.label_tag }} {{ form.servings }}
+    {{ form.as_p }}
+
+    <h2>Etiquetas</h2>
+    <div>
+        {% for tag_type in tag_types %}
+        <button type="button" class="tag-type-button" data-tag-type="{{ tag_type }}">{{ tag_type }}</button>
+        {% endfor %}
+    </div>
+
+    <div id="tag-selection-container">
+        {% for tag_type in tag_types %}
+        <div class="tag-type-section" id="tag-section-{{ tag_type }}" style="display: none;">
+            <h3>{{ tag_type }}</h3>
+            {% for tag in all_tags %}
+            {% if tag.tag_type == tag_type %}
+            <label>
+                <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag in recipe.tags.all %}checked{% endif %}> {{ tag.name }}
+            </label><br>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
 
     <h3>Agregar Ingrediente</h3>
     <div id="ingredients-container">
@@ -70,6 +87,13 @@
 <a href="{% url 'recipe-detail' pk=recipe.pk %}">Volver a la receta</a>
 
 <script>
+    document.querySelectorAll('.tag-type-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const tagType = this.dataset.tagType;
+            const tagSection = document.getElementById(`tag-section-${tagType}`);
+            tagSection.style.display = tagSection.style.display === 'none' ? 'block' : 'none';
+        });
+    });
     document.addEventListener('DOMContentLoaded', function () {
         // Ingredientes
         const ingredientsContainer = document.getElementById('ingredients-container');

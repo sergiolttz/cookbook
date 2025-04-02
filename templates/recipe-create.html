@@ -6,6 +6,28 @@
     {% csrf_token %}
     {{ form.as_p }}
 
+    <h2>Etiquetas</h2>
+    <div>
+        {% for tag_type in tag_types %}
+        <button type="button" class="tag-type-button" data-tag-type="{{ tag_type }}">{{ tag_type }}</button>
+        {% endfor %}
+    </div>
+
+    <div id="tag-selection-container">
+        {% for tag_type in tag_types %}
+        <div class="tag-type-section" id="tag-section-{{ tag_type }}" style="display: none;">
+            <h3>{{ tag_type }}</h3>
+            {% for tag in all_tags %}
+            {% if tag.tag_type == tag_type %}
+            <label>
+                <input type="checkbox" name="tags" value="{{ tag.id }}"> {{ tag.name }}
+            </label><br>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
     <h2>Ingredientes</h2>
     <div id="ingredient-formset-container">
         {{ ingredient_formset.management_form }}
@@ -35,6 +57,13 @@
 </form>
 
 <script>
+    document.querySelectorAll('.tag-type-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const tagType = this.dataset.tagType;
+            const tagSection = document.getElementById(`tag-section-${tagType}`);
+            tagSection.style.display = tagSection.style.display === 'none' ? 'block' : 'none';
+        });
+    });
     // Agregar un nuevo formulario de ingrediente al hacer clic en el botón
     const addIngredientButton = document.getElementById('add-ingredient');
     const ingredientFormsetContainer = document.getElementById('ingredient-formset-container');

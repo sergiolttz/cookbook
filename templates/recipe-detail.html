@@ -36,6 +36,13 @@
         <a href="{% url 'user_profile' username=recipe.author.username %}">Ver Perfil</a>
     </p>
 
+    <h3>Etiquetas:</h3>
+    <ul>
+        {% for tag in recipe.tags.all %}
+        <li>{{ tag.name }} ({{ tag.tag_type }})</li>
+        {% endfor %}
+    </ul>
+
     <h3>Ingredientes:</h3>
     <ul>
         {% for ingredient in recipe.recipeingredient_set.all %}

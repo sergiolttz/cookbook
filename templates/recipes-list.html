@@ -1,44 +1,87 @@
 {% extends '__base.html' %}
 {% block content %}
-<h1>Lista de Recetas</h1>
+<div style="display: flex;">
+    <div style="width: 200px; padding-right: 20px;">
+        <h2>Filtrar por Etiquetas</h2>
+        <form method="get">
+            {% if query %}
+            <input type="hidden" name="q" value="{{ query }}">
+            {% endif %}
+            {% if sort_by %}
+            <input type="hidden" name="sort" value="{{ sort_by }}">
+            {% endif %}
+            {% if order %}
+            <input type="hidden" name="order" value="{{ order }}">
+            {% endif %}
 
-<form method="get">
-    <input type="text" name="q" placeholder="Buscar recetas..." value="{% if query %}{{ query }}{% endif %}">
-    <button type="submit">Buscar</button>
+            <div id="tag-selection-container">
+                {% for tag_type in tag_types %}
+                <div class="tag-type-section">
+                    <h3>{{ tag_type }}</h3>
+                    {% for tag in all_tags %}
+                    {% if tag.tag_type == tag_type %}
+                    <label>
+                        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in selected_tags %}checked{% endif %}> {{ tag.name }}
+                    </label><br>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
 
-    <label for="sort">Ordenar por:</label>
-    <select name="sort" id="sort">
-        <option value="">Ninguno</option>
-        <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
-        <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración</option>
-        <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>Ingredientes</option>
-    </select>
-
-    <label for="order">Orden:</label>
-    <select name="order" id="order">
-        <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
-        <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
-    </select>
-
-    <button type="submit">Filtrar/Ordenar</button>
-</form>
-
-<div class="recipe-list">
-    {% for item in recipes_with_ratings %}
-    <div class="recipe-card">
-        <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
-            <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
-            <h3>{{ item.recipe.title }}</h3>
-            <p>Tiempo: {{ item.recipe.time_required }}</p>
-            <p>Rating: {% if item.avg_rating %}{{ item.avg_rating|floatformat:1 }}{% else %}Sin calificar{% endif %}</p>
-            <p>Ingredientes: {{ item.recipe.recipeingredient_set.count }}</p>
-        </a>
+            <button type="submit">Filtrar</button>
+        </form>
     </div>
-    {% empty %}
-    <p>No se encontraron recetas.</p>
-    {% endfor %}
-    {% if user.is_authenticated %}
-    <a href="{% url 'recipe-create' %}">Crear Receta</a>
-    {% endif %}
+    <div style="flex: 1;">
+        <h1>Lista de Recetas</h1>
+
+        <form method="get">
+            <input type="text" name="q" placeholder="Buscar recetas..." value="{% if query %}{{ query }}{% endif %}">
+            <button type="submit">Buscar</button>
+
+            <label for="sort">Ordenar por:</label>
+            <select name="sort" id="sort">
+                <option value="">Ninguno</option>
+                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
+                <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración</option>
+                <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>Ingredientes</option>
+            </select>
+
+            <label for="order">Orden:</label>
+            <select name="order" id="order">
+                <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
+                <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
+            </select>
+
+            <button type="submit">Filtrar/Ordenar</button>
+        </form>
+
+        <div class="recipe-list">
+            {% for item in recipes_with_ratings %}
+            <div class="recipe-card">
+                <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
+                    <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
+                    <h3>{{ item.recipe.title }}</h3>
+                    <p>Tiempo: {{ item.recipe.time_required }}</p>
+                    <p>Rating: {% if item.avg_rating %}{{ item.avg_rating|floatformat:1 }}{% else %}Sin calificar{% endif %}</p>
+                    <p>Ingredientes: {{ item.recipe.recipeingredient_set.count }}</p>
+                    <p>
+                        {% for tag in item.recipe.tags.all %}
+                        {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                        Sin etiquetas
+                        {% endfor %}
+                    </p>
+                </a>
+            </div>
+            {% empty %}
+            <p>No se encontraron recetas.</p>
+            {% endfor %}
+            {% if user.is_authenticated %}
+            <a href="{% url 'recipe-create' %}">Crear Receta</a>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
 {% endblock %}
