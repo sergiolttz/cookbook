@@ -11,8 +11,6 @@ import datetime
 from django.forms import formset_factory, inlineformset_factory
 from django import template
 
-
-
 def home(request):
     """Vista para la página de inicio."""
     query = request.GET.get('q')  # Obtener la consulta de búsqueda
@@ -26,6 +24,7 @@ def home(request):
         # Si no hay consulta, obtener todas las recetas
         recipes = Recipe.objects.all()
 
+    quick_recipes_with_ratings = []
     quick_recipes = []
     for recipe in recipes:
         if recipe.time_required is not None:
@@ -33,25 +32,40 @@ def home(request):
             td = datetime.timedelta(microseconds=recipe.time_required.total_seconds() * 1000000)
             if td <= datetime.timedelta(minutes=12):
                 quick_recipes.append(recipe)
+                avg_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg']
+                quick_recipes_with_ratings.append({'recipe': recipe, 'avg_rating': avg_rating})
 
+    few_ingredients_recipes_with_ratings = []
     few_ingredients_recipes = [recipe for recipe in recipes if recipe.recipeingredient_set.count() < 3]
+    for recipe in few_ingredients_recipes:
+        avg_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg']
+        few_ingredients_recipes_with_ratings.append({'recipe': recipe, 'avg_rating': avg_rating})
+
+    latest_recipes_with_ratings = []
+    latest_recipes = Recipe.objects.order_by('-created_at')[:3]  # Obtiene las 3 últimas recetas
+    for recipe in latest_recipes:
+        avg_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg']
+        latest_recipes_with_ratings.append({'recipe': recipe, 'avg_rating': avg_rating})
 
     favorite_recipes = []
+    user_profile = None  # Inicializa user_profile
     if request.user.is_authenticated:
         favorite_recipes = request.user.profile.favorite_recipes.all()
-
-    latest_recipes = Recipe.objects.order_by('-created_at')[:3]  # Obtiene las 3 últimas recetas
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
 
     return render(request, 'home.html', {
         'recipes': recipes,
-        'quick_recipes': quick_recipes[:3],  # Muestra solo las primeras 3 recetas rápidas
-        'few_ingredients_recipes': few_ingredients_recipes[:3],  # Muestra solo las primeras 3 recetas con pocos ingredientes
+        'quick_recipes_with_ratings': quick_recipes_with_ratings[:3],
+        'few_ingredients_recipes_with_ratings': few_ingredients_recipes_with_ratings[:3],
         'favorite_recipes': favorite_recipes,
-        'latest_recipes': latest_recipes,  # Muestra las 3 últimas recetas
-        'has_more_quick_recipes': len(quick_recipes) > 3,  # Indica si hay más recetas rápidas
-        'has_more_few_ingredients_recipes': len(few_ingredients_recipes) > 3,  # Indica si hay más recetas con pocos ingredientes
+        'latest_recipes_with_ratings': latest_recipes_with_ratings,
+        'has_more_quick_recipes': len(quick_recipes) > 3,
+        'has_more_few_ingredients_recipes': len(few_ingredients_recipes) > 3,
+        'user_profile': user_profile,
     })
-
 def recipe_list(request):
     """Vista para mostrar la lista de recetas con búsqueda, ordenamiento y filtro por etiquetas."""
     query = request.GET.get('q')
@@ -95,6 +109,13 @@ def recipe_list(request):
     tag_types = Tag.objects.values_list('tag_type', flat=True).distinct()
     all_tags = Tag.objects.all()  # Obtener todas las etiquetas
 
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
+
     return render(request, 'recipes-list.html', {
         'recipes_with_ratings': recipes_with_ratings,
         'query': query,
@@ -103,6 +124,7 @@ def recipe_list(request):
         'tag_types': tag_types,
         'all_tags': all_tags,  # Pasar todas las etiquetas al contexto
         'selected_tags': selected_tags,
+        'user_profile': user_profile,  # Añade user_profile al contexto
     })
 
 def recipe_detail(request, pk):
@@ -129,10 +151,18 @@ def recipe_detail(request, pk):
     else:
         form = RatingForm()
 
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
+
     context = {
         'recipe': recipe,
         'average_rating': average_rating,
         'form': form,
+        'user_profile': user_profile,  # Añade user_profile al contexto
     }
 
     return render(request, 'recipe-detail.html', context)
@@ -143,7 +173,7 @@ def recipe_create(request):
     IngredientFormSet = formset_factory(IngredientForm, extra=1)
     StepFormSet = formset_factory(StepForm, extra=1)
 
-    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct() #new
+    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct()  # new
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
@@ -189,14 +219,22 @@ def recipe_create(request):
         ingredient_empty_form_html = ingredient_formset.empty_form.as_p
         step_empty_form_html = step_formset.empty_form.as_p
 
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
+
     return render(request, 'recipe-create.html', {
         'form': form,
         'ingredient_formset': ingredient_formset,
         'step_formset': step_formset,
         'ingredient_empty_form_html': ingredient_empty_form_html,
         'step_empty_form_html': step_empty_form_html,
-        'tag_types': tag_types, #new
-        'all_tags': Tag.objects.all(), #new
+        'tag_types': tag_types,  # new
+        'all_tags': Tag.objects.all(),  # new
+        'user_profile': user_profile,  # Añade user_profile al contexto
     })
 
 register = template.Library()
@@ -213,26 +251,34 @@ def recipe_update(request, pk):
     if recipe.author != request.user:
         return redirect('recipe-detail', pk=recipe.pk)
 
-    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct() #new
+    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct()  # new
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
-        selected_tags = request.POST.getlist('tags') #new
+        selected_tags = request.POST.getlist('tags')  # new
 
         if form.is_valid():
             form.save()
             recipe.tags.clear()  # Limpiar etiquetas existentes #new
-            for tag_id in selected_tags: #new
-                recipe.tags.add(tag_id) #new
+            for tag_id in selected_tags:  # new
+                recipe.tags.add(tag_id)  # new
             return redirect('recipe-detail', pk=recipe.pk)
     else:
         form = RecipeForm(instance=recipe)
+
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
 
     return render(request, 'recipe-update.html', {
         'form': form,
         'recipe': recipe,
         'tag_types': tag_types,
         'all_tags': Tag.objects.all(),
+        'user_profile': user_profile,  # Añade user_profile al contexto
     })
 
 @login_required
@@ -248,8 +294,14 @@ def recipe_delete(request, pk):
         recipe.delete()
         return redirect('recipes-list')
 
-    return render(request, 'recipe-delete.html', {'recipe': recipe})
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
 
+    return render(request, 'recipe-delete.html', {'recipe': recipe, 'user_profile': user_profile})
 
 def recipe_pdf(request, pk):
     """Vista para generar un PDF de la receta."""
@@ -260,7 +312,7 @@ def recipe_pdf(request, pk):
 
     html_string = render_to_string('recipe-pdf.html', {'recipe': recipe, 'image_url': image_url})
 
-    config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe') # Reemplaza con la ruta correcta
+    config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')  # Reemplaza con la ruta correcta
     options = {
         'encoding': 'UTF-8',
     }
@@ -270,7 +322,6 @@ def recipe_pdf(request, pk):
     response['Content-Disposition'] = f'attachment; filename="{recipe.title}.pdf"'
 
     return response
-
 
 def user_profile(request, username):
     """Vista para ver el perfil de usuario."""
@@ -314,7 +365,15 @@ def edit_profile(request):
             return redirect('user_profile', username=request.user.username)
     else:
         form = UserProfileForm(instance=user_profile)
-    return render(request, 'edit-profile.html', {'form': form})
+
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
+
+    return render(request, 'edit-profile.html', {'form': form, 'user_profile': user_profile})
 
 @login_required
 def deactivate_account(request):
@@ -332,4 +391,10 @@ def deactivate_account(request):
         logout(request)
 
         return redirect('recipes-list')
-    return redirect('edit_profile')
+    user_profile = None  # Inicializa user_profile
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            pass
+    return render(request, 'edit-profile.html', {'user_profile': user_profile})

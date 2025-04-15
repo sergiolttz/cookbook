@@ -1,0 +1,59 @@
+<div class="recipe-card">
+    <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
+        {% if item.recipe.image %}
+        <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
+        {% endif %}
+        <h3>{{ item.recipe.title }}</h3>
+        <div class="recipe-details">
+            <div class="stars">
+                {% if item.avg_rating %}
+                {% if item.avg_rating >= 5 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+                {% elif item.avg_rating >= 4.5 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star filled">★</span><span class="star filled">★</span><span class="star half">½</span>
+                {% elif item.avg_rating >= 4 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star filled">★</span><span class="star filled">★</span><span class="star empty">☆</span>
+                {% elif item.avg_rating >= 3.5 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star filled">★</span><span class="star half">½</span><span class="star empty">☆</span>
+                {% elif item.avg_rating >= 3 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star filled">★</span><span class="star empty">☆</span><span class="star empty">☆</span>
+                {% elif item.avg_rating >= 2.5 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star half">½</span><span class="star empty">☆</span><span class="star empty">☆</span>
+                {% elif item.avg_rating >= 2 %}
+                <span class="star filled">★</span><span class="star filled">★</span><span
+                    class="star empty">☆</span><span class="star empty">☆</span><span class="star empty">☆</span>
+                {% elif item.avg_rating >= 1.5 %}
+                <span class="star filled">★</span><span class="star half">½</span><span class="star empty">☆</span><span
+                    class="star empty">☆</span><span class="star empty">☆</span>
+                {% elif item.avg_rating >= 1 %}
+                <span class="star filled">★</span><span class="star empty">☆</span><span
+                    class="star empty">☆</span><span class="star empty">☆</span><span class="star empty">☆</span>
+                {% elif item.avg_rating > 0 %}
+                <span class="star half">½</span><span class="star empty">☆</span><span class="star empty">☆</span><span
+                    class="star empty">☆</span><span class="star empty">☆</span>
+                {% else %}
+                <span>Sin calificar</span>
+                {% endif %}
+                {% else %}
+                <span>Sin calificar</span>
+                {% endif %}
+            </div>
+            <p>⏲ {{ item.recipe.time_required }} | {{ item.recipe.recipeingredient_set.count }} Ingredientes</p>
+            <div class="tags-container">
+                {% for tag in item.recipe.tags.all %}
+                <a href="{% url 'recipes-list' %}?tags={{ tag.id }}" class="recipe-tag-link">
+                    <p class="recipe-tag">{{ tag.name }}</p>
+                </a>
+                {% empty %}
+                <p class="no-tags">Sin etiquetas</p>
+                {% endfor %}
+            </div>
+        </div>
+    </a>
+</div>

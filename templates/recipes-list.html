@@ -21,7 +21,7 @@
                     {% for tag in all_tags %}
                     {% if tag.tag_type == tag_type %}
                     <label>
-                        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in selected_tags %}checked{% endif %}> {{ tag.name }}
+                        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in selected_tags %} checked {% endif %}> {{ tag.name }}
                     </label><br>
                     {% endif %}
                     {% endfor %}
@@ -33,7 +33,7 @@
         </form>
     </div>
     <div style="flex: 1;">
-        <h1>Lista de Recetas</h1>
+        <h1>Lista de Recetas {% if current_tag %}con la etiqueta "{{ current_tag.name }}"{% endif %}</h1>
 
         <form method="get">
             <input type="text" name="q" placeholder="Buscar recetas..." value="{% if query %}{{ query }}{% endif %}">
@@ -65,17 +65,19 @@
                     <p>Tiempo: {{ item.recipe.time_required }}</p>
                     <p>Rating: {% if item.avg_rating %}{{ item.avg_rating|floatformat:1 }}{% else %}Sin calificar{% endif %}</p>
                     <p>Ingredientes: {{ item.recipe.recipeingredient_set.count }}</p>
-                    <p>
+                    <div class="tags-container">
                         {% for tag in item.recipe.tags.all %}
-                        {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                            <a href="{% url 'recipes-list' %}?tags={{ tag.id }}" class="recipe-tag-link">
+                                <p class="recipe-tag">{{ tag.name }}</p>
+                            </a>
                         {% empty %}
-                        Sin etiquetas
+                        <p>Sin etiquetas</p>
                         {% endfor %}
-                    </p>
+                    </div>
                 </a>
             </div>
             {% empty %}
-            <p>No se encontraron recetas.</p>
+            <p>No se encontraron recetas{% if current_tag %} con la etiqueta "{{ current_tag.name }}"{% endif %}.</p>
             {% endfor %}
             {% if user.is_authenticated %}
             <a href="{% url 'recipe-create' %}">Crear Receta</a>

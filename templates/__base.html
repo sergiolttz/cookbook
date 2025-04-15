@@ -4,25 +4,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CookBook</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="apple-touch-icon" sizes="any" href="{% static 'apple-touch-icon.png' %}">
+    <title>TasteBook</title>
 </head>
 
 <body>
-
-    <header>
-        <h1>
-            <a href="{% url 'home' %}">CookBook</a>
-        </h1>
-        {% if user.is_authenticated %}
-        <p>Bienvenido, {{ user.username }}!</p>
-        <p><a href="{% url 'user_profile' username=user.username %}">Mi Perfil</a> | <a href="{% url 'account_logout' %}">Cerrar Sesión</a></p>
-        {% else %}
-        <p><a href="{% url 'account_login' %}">Iniciar Sesión</a> | <a href="{% url 'account_signup' %}">Registrarse</a></p>
+    <header class="header">
+        {% if request.path != '/recipes/' %}
+        <div class="logo">
+            <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook">
+            </a>
+        </div>
+        <div class="header-search-bar">
+            <form class="search-form" method="get" action="{% url 'recipes-list' %}">
+                <input type="text" name="q" placeholder="Buscar recetas...">
+                <button type="submit" class="search-button">Buscar</button>
+            </form>
+        </div>
         {% endif %}
+        <div class="profile-info">
+            {% if user.is_authenticated %}
+            <div class="profile-dropdown">
+                <div class="profile-icon">
+                    <img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil" id="profile-toggle">
+                </div>
+                <div class="dropdown-content" id="profile-menu">
+                    <div class="dropdown-header">
+                        <div class="profile-icon-dropdown">
+                            <img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil">
+                        </div>
+                        <p>Hola <strong>{{ user.username }}</strong></p>
+                    </div>
+                    <a href="{% url 'user_profile' username=user.username %}" class="dropdown-item">Mi Perfil</a>
+                    <a href="{% url 'account_logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                </div>
+            </div>
+            {% else %}
+            <p><a class="button header-btn" href="{% url 'account_login' %}">Iniciar Sesión</a>  <a class="button header-btn" href="{% url 'account_signup' %}">Registrarse</a>
+            </p>
+            {% endif %}
+        </div>
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
-            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            <li class="message {% if message.tags %} {{ message.tags }} {% endif %}">{{ message }}</li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -31,6 +63,61 @@
         {% block content %}
         {% endblock content %}
     </div>
+
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchForm = document.querySelector('.search-form');
+            const searchInput = searchForm.querySelector('input[name="q"]');
+            const searchButton = searchForm.querySelector('.search-button');
+
+            if (searchForm && searchInput && searchButton) {
+                searchForm.addEventListener('submit', function (event) {
+                    if (searchInput.value.trim() === '') {
+                        event.preventDefault();
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+                const profileToggle = document.getElementById('profile-toggle');
+                const profileMenu = document.getElementById('profile-menu');
+
+                if (profileToggle && profileMenu) {
+                    profileToggle.addEventListener('click', function (event) {
+                        event.stopPropagation(); // Evita que el clic se propague al documento
+                        profileMenu.classList.toggle('show-dropdown');
+                    });
+
+                    // Cierra el dropdown si se hace clic fuera de él
+                    document.addEventListener('click', function (event) {
+                        if (!profileMenu.contains(event.target) && event.target !== profileToggle) {
+                            profileMenu.classList.remove('show-dropdown');
+                        }
+                    });
+                }
+        })
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(message => {
+                // Añadir clase para mostrar el mensaje con animación CSS
+                setTimeout(() => {
+                    message.classList.add('show');
+                    // Remover clase para iniciar la animación de desaparición con CSS
+                    setTimeout(() => {
+                        message.classList.remove('show');
+                        // Opcional: Ocultar completamente el elemento después de la animación
+                        message.addEventListener('transitionend', () => {
+                            message.style.display = 'none';
+                        });
+                    }, 3000); // Tiempo que el mensaje estará visible (3 segundos)
+                }, 10); // Un pequeño delay para asegurar que la clase se aplique después de renderizar
+            });
+        });
+    </script>
+
 </body>
 
 </html>
