@@ -8,8 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg, Count
 from django.contrib.auth.models import User
 import datetime
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import formset_factory
 from django import template
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def home(request):
     """Vista para la página de inicio."""
@@ -66,8 +67,9 @@ def home(request):
         'has_more_few_ingredients_recipes': len(few_ingredients_recipes) > 3,
         'user_profile': user_profile,
     })
+
 def recipe_list(request):
-    """Vista para mostrar la lista de recetas con búsqueda, ordenamiento y filtro por etiquetas."""
+    """Vista para mostrar la lista de recetas con búsqueda, ordenamiento y filtro por etiquetas con paginación."""
     query = request.GET.get('q')
     sort_by = request.GET.get('sort')
     order = request.GET.get('order', 'asc')
@@ -99,9 +101,22 @@ def recipe_list(request):
         else:
             recipes = recipes.annotate(ingredient_count=Count('recipeingredient')).order_by('-ingredient_count')
 
-    # Calcula la calificación promedio para cada receta
+    # Paginación
+    paginator = Paginator(recipes, 9)  # Mostrar 9 recetas por página
+    page = request.GET.get('page')
+
+    try:
+        recipes_page = paginator.page(page)
+    except PageNotAnInteger:
+        # Si page no es un entero, entrega la primera página.
+        recipes_page = paginator.page(1)
+    except EmptyPage:
+        # Si page está fuera de rango (ej. 9999), entrega la última página.
+        recipes_page = paginator.page(paginator.num_pages)
+
+    # Calcula la calificación promedio para las recetas en la página actual
     recipes_with_ratings = []
-    for recipe in recipes:
+    for recipe in recipes_page.object_list:
         avg_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg']
         recipes_with_ratings.append({'recipe': recipe, 'avg_rating': avg_rating})
 
@@ -118,6 +133,7 @@ def recipe_list(request):
 
     return render(request, 'recipes-list.html', {
         'recipes_with_ratings': recipes_with_ratings,
+        'recipes_page': recipes_page,  # Pasar el objeto Page a la plantilla
         'query': query,
         'sort_by': sort_by,
         'order': order,

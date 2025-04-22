@@ -1,7 +1,7 @@
 {% extends '__base.html' %}
 {% block content %}
 <div style="display: flex;">
-    <div style="width: 200px; padding-right: 20px;">
+    <div class="filter-section">
         <h2>Filtrar por Etiquetas</h2>
         <form method="get">
             {% if query %}
@@ -32,58 +32,83 @@
             <button type="submit">Filtrar</button>
         </form>
     </div>
+
     <div style="flex: 1;">
-        <h1>Lista de Recetas {% if current_tag %}con la etiqueta "{{ current_tag.name }}"{% endif %}</h1>
 
-        <form method="get">
-            <input type="text" name="q" placeholder="Buscar recetas..." value="{% if query %}{{ query }}{% endif %}">
-            <button type="submit">Buscar</button>
+        <div class="recipes-section">
+            <form method="get">
+                <div class="search-form">
+                    <input type="text" name="q" placeholder="Buscar recetas..."
+                        value="{% if query %}{{ query }}{% endif %}">
+                    <button type="submit" class="search-button">Buscar</button>
+                </div>
 
-            <label for="sort">Ordenar por:</label>
-            <select name="sort" id="sort">
-                <option value="">Ninguno</option>
-                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
-                <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración</option>
-                <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>Ingredientes</option>
-            </select>
 
-            <label for="order">Orden:</label>
-            <select name="order" id="order">
-                <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
-                <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
-            </select>
+                <div class="filter-controls-container">
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="sort">Ordenar por:</label>
+                            <select name="sort" id="sort">
+                                <option value="">Ninguno</option>
+                                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
+                                <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración
+                                </option>
+                                <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>
+                                    Ingredientes</option>
+                            </select>
+                        </div>
 
-            <button type="submit">Filtrar/Ordenar</button>
-        </form>
-
-        <div class="recipe-list">
-            {% for item in recipes_with_ratings %}
-            <div class="recipe-card">
-                <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
-                    <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
-                    <h3>{{ item.recipe.title }}</h3>
-                    <p>Tiempo: {{ item.recipe.time_required }}</p>
-                    <p>Rating: {% if item.avg_rating %}{{ item.avg_rating|floatformat:1 }}{% else %}Sin calificar{% endif %}</p>
-                    <p>Ingredientes: {{ item.recipe.recipeingredient_set.count }}</p>
-                    <div class="tags-container">
-                        {% for tag in item.recipe.tags.all %}
-                            <a href="{% url 'recipes-list' %}?tags={{ tag.id }}" class="recipe-tag-link">
-                                <p class="recipe-tag">{{ tag.name }}</p>
-                            </a>
-                        {% empty %}
-                        <p>Sin etiquetas</p>
-                        {% endfor %}
+                        <div class="filter-group">
+                            <label for="order">Orden:</label>
+                            <select name="order" id="order">
+                                <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
+                                <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
+                            </select>
+                        </div>
                     </div>
-                </a>
-            </div>
-            {% empty %}
-            <p>No se encontraron recetas{% if current_tag %} con la etiqueta "{{ current_tag.name }}"{% endif %}.</p>
-            {% endfor %}
-            {% if user.is_authenticated %}
-            <a href="{% url 'recipe-create' %}">Crear Receta</a>
-            {% endif %}
+
+                    <button type="submit" class="filter-button">Filtrar/Ordenar</button>
+                </div>
+            </form>
         </div>
+
+
+        <section class="recipes-section">
+            <h1>Lista de Recetas {% if current_tag %}con la etiqueta "{{ current_tag.name }}"{% endif %}</h1>
+
+            <div class="recipe-list">
+                {% for item in recipes_with_ratings %}
+                {% include 'recipe-card.html' %}
+                {% empty %}
+                <p>No hay recetas disponibles con los filtros aplicados en esta página.</p>
+                {% endfor %}
+            </div>
+
+            <div class="pagination">
+                <span class="step-links">
+                    {% if recipes_page.has_previous %}
+                    <a class="button pagination-button" style="background-color: var(--primario);"
+                        href="?page=1{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}"> Primera</a>
+                    <a class="button pagination-button" style="background-color: var(--primario);"
+                        href="?page={{ recipes_page.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}">Anterior</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Página {{ recipes_page.number }} de {{ recipes_page.paginator.num_pages }}.
+                    </span>
+            
+                    {% if recipes_page.has_next %}
+                    <a class="button pagination-button" style="background-color: var(--primario);"
+                        href="?page={{ recipes_page.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}">Siguiente</a>
+                    <a class="button pagination-button" style="background-color: var(--primario);"
+                        href="?page={{ recipes_page.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}">Última</a>
+                    {% endif %}
+                </span>
+            </div>
+        </section>
     </div>
 </div>
+
+{% include 'footer.html' %}
 
 {% endblock %}

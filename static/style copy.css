@@ -1,0 +1,652 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #dda15e;
+}
+
+.a {
+    text-decoration: none;
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.header {
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+}
+
+.header .logo {
+    order: 1;
+    margin-left: 40px;
+    margin-right: 20px;
+}
+
+.header .logo img {
+    height: 100px;
+    width: auto;
+}
+
+.header .logo a {
+    display: block;
+    height: 100%;
+}
+
+.header .header-search-bar {
+    order: 2;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    margin-right: 20px;
+    /* Espacio entre barra de búsqueda y perfil */
+}
+
+.header .search-form {
+    display: flex;
+    width: 60%;
+}
+
+.header .search-form input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    font-size: 16px;
+}
+
+.header .search-form button.search-button {
+    padding: 10px 15px;
+    background-color: #606c38;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.header .search-form button.search-button:hover {
+    background-color: #4a532d;
+}
+
+.header .profile-info {
+    display: flex;
+    align-items: center;
+    order: 3;
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+.header .profile-icon {
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.header .profile-icon img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header p {
+    margin: 0;
+    margin-right: 15px;
+}
+
+.messages {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.messages .message {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, margin-top 0.5s ease-in-out;
+    margin-top: -20px;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.messages .message.show {
+    opacity: 1;
+    margin-top: 0;
+}
+
+/* Estilos para el contenedor del dropdown */
+.profile-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 0;
+    top: 100%;
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* Estilos para el header del dropdown */
+.dropdown-content .dropdown-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown-content .dropdown-header .profile-icon-dropdown {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.dropdown-content .dropdown-header .profile-icon-dropdown img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dropdown-content .dropdown-header p {
+    margin: 20px;
+    font-size: 1em;
+}
+
+/* Estilos para los items del dropdown */
+.dropdown-content .dropdown-item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.dropdown-content .dropdown-item:hover {
+    background-color: #ddd;
+}
+
+/* Clase para mostrar el dropdown (se toggoleará con JavaScript) */
+.show-dropdown {
+    display: block;
+}
+
+/* Ajuste para el texto de sesión/registro cuando no hay dropdown */
+.header .profile-info p a {
+    margin-left: 10px;
+    color: #333;
+    text-decoration: none;
+}
+
+/* Estilos específicos para los tipos de mensajes */
+.messages .message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.messages .message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.messages .message.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.messages .message.info {
+    background-color: #e2e7f0;
+    color: #383d41;
+    border: 1px solid #d1d7e0;
+}
+
+.recipes-section {
+    background-color: #fffdee;
+    margin: 30px;
+    padding: 20px;
+    border-radius: 5px;
+    color: #283618;
+    display: flex;
+    flex-direction: column;
+}
+
+.recipes-section .recipe-card a {
+    color: #283618;
+    text-decoration: none;
+}
+
+.recipes-section .recipe-card:hover {
+    background-color: rgb(240, 240, 235)
+}
+
+.recipes-section .recipe-card a:visited {
+    color: #283618 !important;
+}
+
+.recipes-section h2 {
+    margin-bottom: 20px;
+}
+
+.recipe-list {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.recipe-card {
+    background-color: #fefae0;
+    width: 30%;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.recipe-card img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.recipe-card h3 {
+    padding: 10px;
+    margin: 0;
+}
+
+.recipe-card .recipe-details {
+    padding: 0 10px 10px;
+}
+
+.recipe-card .stars {
+    display: inline-block;
+}
+
+.recipe-card .star {
+    font-size: 1em;
+    color: gold;
+}
+
+.recipe-card .star.empty {
+    color: lightgray;
+}
+
+.recipe-card .star.half::after {
+    content: '½';
+    position: absolute;
+    overflow: hidden;
+    width: 50%;
+    color: gold;
+}
+
+.recipe-card .recipe-details .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.recipe-card .recipe-details .tags-container p.recipe-tag {
+    background-color: #c9d2ab;
+    color: #606c38;
+    padding: 5px 8px;
+    border-radius: 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.recipe-card .recipe-details .tags-container p {
+    margin: 0;
+}
+
+.recipe-card .recipe-details .tags-container .no-tags {
+    background-color: #c9d2ab;
+    color: #606c38;
+    padding: 5px 8px;
+    border-radius: 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+}
+
+.footer .footer-logo {
+    order: 1;
+    margin-left: 30px;
+}
+
+.footer .footer-logo img {
+    height: 150px;
+    width: auto;
+}
+
+.footer .footer-links {
+    order: 2;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+.footer .footer-links a {
+    margin: 0 10px;
+    color: #fffdee;
+    text-decoration: none;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    padding: 20px;
+    margin: 30px;
+    box-sizing: border-box;
+    background-color: #fffdee;
+    border-radius: 5px;
+}
+
+.search-wrapper {
+    text-align: center;
+    width: 80%;
+    max-width: 800px;
+}
+
+.home-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.home-logo img {
+    height: 250px;
+    width: auto;
+}
+
+/* Estilos para el formulario de búsqueda en home.html */
+.search-form {
+    display: flex;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.search-form input[type="text"] {
+    flex-grow: 1;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    font-size: 18px;
+}
+
+.search-form button.search-button {
+    padding: 15px 25px;
+    background-color: #606c38;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.search-form button.search-button:hover {
+    background-color: #4a532d;
+}
+
+/* Estilos para el contenedor de los botones debajo de la búsqueda en home.html */
+.button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Estilos para los botones en home.html */
+.button {
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 200px;
+}
+
+.all-recipes-btn {
+    background-color: #bc6c25;
+}
+
+.all-recipes-btn:hover {
+    background-color: #a45a1b;
+}
+
+.create-recipe-btn {
+    background-color: #4CAF50;
+}
+
+.create-recipe-btn:hover {
+    background-color: #45a049;
+}
+
+.view-more-btn {
+    margin-top: 10px;
+    background-color: #bc6c25;
+    color: white;
+    /* Asegúrate de que el texto del botón sea visible */
+    padding: 12px 25px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    align-self: flex-end;
+    /* Alinea el botón al final (derecha en este contexto) */
+}
+
+.view-more-btn:hover {
+    background-color: #a45a1b;
+}
+
+.header-btn {
+    margin-top: 10px;
+    background-color: #fefae0;
+    color: #4a532d;
+    padding: 12px 25px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-left: 10px;
+}
+
+.header-btn:hover {
+    background-color: #fffdee;
+}
+
+.filter-section {
+    background-color: #fffdee;
+    margin: 30px;
+    margin-right: 0;
+    padding: 20px;
+    border-radius: 5px;
+    color: #283618;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+}
+
+.filter-section form {
+    display: flex;
+    /* Para alinear los elementos del formulario en fila */
+    flex-direction: column;
+    /* Para que las etiquetas y los inputs estén uno encima del otro */
+    gap: 10px;
+    /* Espacio entre los elementos del formulario */
+    margin-bottom: 20px;
+    /* Espacio debajo del formulario */
+}
+
+.filter-section label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.filter-section input[type="text"],
+.filter-section select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    /* Para que ocupen todo el ancho disponible dentro del formulario */
+    box-sizing: border-box;
+    /* Para que el padding y el border no aumenten el ancho total */
+}
+
+.filter-section button[type="submit"] {
+    background-color: #bc6c25;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+    /* Espacio antes del botón */
+    width: 100%;
+    /* Para que ocupe todo el ancho del formulario */
+    box-sizing: border-box;
+}
+
+.filter-section button[type="submit"]:hover {
+    background-color: #a45a1b;
+}
+
+/* Contenedor principal para los controles de filtro y el botón */
+.filter-controls-container {
+    display: flex;
+    /* Alinea los controles y el botón en la misma línea */
+    gap: 20px;
+    /* Espacio entre los controles y el botón */
+    margin-bottom: 20px;
+    /* Espacio debajo de todo el bloque de filtros */
+    align-items: flex-end;
+    /* Alinea los elementos verticalmente al centro */
+    width: 100%;
+    /* O el ancho que desees */
+    box-sizing: border-box;
+}
+
+/* Contenedor para los controles de "Ordenar por" y "Orden" */
+.filter-controls {
+    display: flex;
+    /* Coloca los grupos de filtro en la misma línea */
+    gap: 20px;
+    /* Espacio entre los grupos de filtro */
+    flex-grow: 1;
+    /* Permite que los controles ocupen el espacio restante */
+}
+
+/* Estilos para cada grupo de filtro (etiqueta y select) */
+.filter-controls .filter-group {
+    display: flex;
+    flex-direction: column;
+    /* Coloca la etiqueta encima del select inicialmente */
+    flex: 1;
+    /* Permite que los grupos de filtro crezcan y ocupen espacio igualitariamente */
+}
+
+/* Estilos para las etiquetas de los filtros */
+.filter-controls .filter-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    /* Espacio entre la etiqueta y el select */
+    color: #283618;
+    font-size: 1em;
+}
+
+/* Estilos para los selectores de los filtros */
+.filter-controls .filter-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #283618;
+    background-color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    height: fit-content;
+    appearance: none;
+    background-position: right 10px center;
+    cursor: pointer;
+}
+
+/* Estilos para las opciones del desplegable */
+.filter-controls .filter-group select option {
+    padding: 8px 12px;
+    font-size: 16px;
+    color: #283618;
+    background-color: #fff;
+}
+
+/* Estilo para la opción cuando el mouse pasa por encima */
+.filter-controls .filter-group select option:hover {
+    background-color: #a45a1b;
+    /* Color del botón de filtrar */
+    color: white;
+    cursor: pointer;
+}
+
+/* Estilo para la opción seleccionada (puede variar según el navegador) */
+.filter-controls .filter-group select option:checked {
+    background-color: #bc6c25;
+    color: white;
+}
+
+/* Estilos para el botón de "Filtrar/Ordenar" */
+.filter-button {
+    background-color: #bc6c25;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    box-sizing: border-box;
+    height: fit-content;
+}
+
+.filter-button:hover {
+    background-color: #a45a1b;
+}

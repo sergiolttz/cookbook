@@ -1,78 +1,91 @@
 {% extends '__base.html' %}
 
 {% block content %}
-<div class="recipe-detail">
-    <h2>{{ recipe.title }}</h2>
-
-    {% if average_rating %}
-    <p><strong>Calificación Promedio:</strong> {{ average_rating|floatformat:1 }}</p>
-    {% else %}
-    <p>Esta receta aún no ha sido calificada.</p>
-    {% endif %}
-
-    {% if user.is_authenticated %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Calificar</button>
-    </form>
-    {% else %}
-    <p>Inicia sesión para calificar esta receta.</p>
-    {% endif %}
-
-    {% if user.is_authenticated and user == recipe.author %}
-    <a href="{% url 'recipe-update' pk=recipe.pk %}">Editar Receta</a>
-    <a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
-    {% endif %}
-
+<div class="recipe-detail-container">
+    <h1>{{ recipe.title }}</h1>
     {% if recipe.image %}
-    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 400px;">
+    <div class="recipe-detail-header">
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+        <div class="recipe-details-section">
+            <p>{{ recipe.description }}</p>
+            <div class="tags-container">
+                {% for tag in recipe.tags.all %}
+                <a href="{% url 'recipes-list' %}?tags={{ tag.id }}" class="recipe-tag-link">
+                    <p class="recipe-tag">{{ tag.name }}</p>
+                </a>
+                {% empty %}
+                <p class="no-tags">Sin etiquetas</p>
+                {% endfor %}
+            </div>
+            <p>Tiempo requerido: {{ recipe.time_required }}</p>
+            <p>Porciones: {{ recipe.servings }}</p>
+            <p>Autor: <a href="{% url 'user_profile' username=recipe.author.username %}">{{ recipe.author.username }}</a> </p>
+            {% if user.is_authenticated and user == recipe.author %}
+            <div class="recipe-actions">
+                <a href="{% url 'recipe-update' pk=recipe.pk %}" class="button">Editar Receta</a>
+                <a href="{% url 'recipe-delete' pk=recipe.pk %}" class="button">Eliminar Receta</a>
+            </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <div class="favorite-actions">
+                {% if recipe in user.profile.favorite_recipes.all %}
+                <form method="post" action="{% url 'remove_favorite' recipe.id %}">
+                    {% csrf_token %}
+                    <button class="button" type="submit">Quitar de Favoritos</button>
+                </form>
+                {% else %}
+                <form method="post" action="{% url 'add_favorite' recipe.id %}">
+                    {% csrf_token %}
+                    <button class="button" type="submit">Añadir a Favoritos</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
     {% endif %}
 
-    <p><strong>Descripción:</strong> {{ recipe.description }}</p>
-    <p><strong>Tiempo requerido:</strong> {{ recipe.time_required }}</p>
-    <p><strong>Porciones:</strong> {{ recipe.servings }}</p>
-    <p><strong>Autor:</strong> {{ recipe.author.username }}
-        <a href="{% url 'user_profile' username=recipe.author.username %}">Ver Perfil</a>
-    </p>
+    <div class="recipe-main-content">
+        <div class="recipe-rating-section">
+            {% if user.is_authenticated %}
+            <h3>Calificar esta receta:</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="star-rating">
+                    {% for i in '54321' %}
+                    <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if form.rating.value == i|stringformat:'s' %}checked{% endif %}>
+                    <label for="star{{ i }}" title="{{ i }} estrellas">★</label>
+                    {% endfor %}
+                </div>
+                <button class="button" type="submit">Calificar</button>
+            </form>
+            {% else %}
+            <p>Inicia sesión para calificar esta receta.</p>
+            {% endif %}
+            {% if average_rating %}
+            <p>Calificación Promedio: {{ average_rating|floatformat:1 }}</p>
+            {% else %}
+            <p>Esta receta aún no ha sido calificada.</p>
+            {% endif %}
+        </div>
 
-    <h3>Etiquetas:</h3>
-    <ul>
-        {% for tag in recipe.tags.all %}
-        <li>{{ tag.name }} ({{ tag.tag_type }})</li>
-        {% endfor %}
-    </ul>
+        <div class="recipe-details-section">
+            <h3>Pasos:</h3>
+            <ol>
+                {% for step in recipe.steps.all %}
+                <li>{{ step.description }}</li>
+                {% endfor %}
+            </ol>
 
-    <h3>Ingredientes:</h3>
-    <ul>
-        {% for ingredient in recipe.recipeingredient_set.all %}
-        <li>{{ ingredient.quantity }} {{ ingredient.get_measurement_display }} de {{ ingredient.ingredient.name }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Pasos:</h3>
-    <ol>
-        {% for step in recipe.steps.all %}
-        <li>{{ step.description }}</li>
-        {% endfor %}
-    </ol>
-    {% if user.is_authenticated %}
-    {% if recipe in user.profile.favorite_recipes.all %}
-    <form method="post" action="{% url 'remove_favorite' recipe.id %}">
-        {% csrf_token %}
-        <button type="submit">Quitar de Favoritos</button>
-    </form>
-    {% else %}
-    <form method="post" action="{% url 'add_favorite' recipe.id %}">
-        {% csrf_token %}
-        <button type="submit">Añadir a Favoritos</button>
-    </form>
-    {% endif %}
-    {% endif %}
-    <button id="copy-link">Copiar Enlace</button>
-    <input type="text" id="recipe-link" value="{{ request.build_absolute_uri }}" readonly style="display: none;">
-    <a href="{% url 'recipe-pdf' pk=recipe.pk %}" class="btn btn-primary">Descargar PDF</a>
-    <a href="{% url 'recipes-list' %}">Volver a la lista de recetas</a>
+            <div class="recipe-links">
+                <button class="button" id="copy-link">Copiar Enlace</button>
+                <input type="text" id="recipe-link" value="{{ request.build_absolute_uri }}" readonly
+                    style="display: none;">
+                <a href="{% url 'recipe-pdf' pk=recipe.pk %}" class="button">Descargar PDF</a>
+                <a href="{% url 'recipes-list' %}" class="button">Volver a la lista de recetas</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

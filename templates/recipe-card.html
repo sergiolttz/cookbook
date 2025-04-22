@@ -1,4 +1,5 @@
 <div class="recipe-card">
+    {% if item.recipe %}
     <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
         {% if item.recipe.image %}
         <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
@@ -44,7 +45,7 @@
                 <span>Sin calificar</span>
                 {% endif %}
             </div>
-            <p>⏲ {{ item.recipe.time_required }} | {{ item.recipe.recipeingredient_set.count }} Ingredientes</p>
+            <p>🕐 {{ item.recipe.time_required }} | {{ item.recipe.recipeingredient_set.count }} Ingredientes</p>
             <div class="tags-container">
                 {% for tag in item.recipe.tags.all %}
                 <a href="{% url 'recipes-list' %}?tags={{ tag.id }}" class="recipe-tag-link">
@@ -56,4 +57,7 @@
             </div>
         </div>
     </a>
+    {% else %}
+    <p>Error: No se pudo cargar la receta.</p>
+    {% endif %}
 </div>
