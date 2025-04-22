@@ -7,64 +7,152 @@
     <style>
         body {
             font-family: sans-serif;
-            margin: 20px;
+            margin: 2cm; 
+            padding: 0;
+            background-color: #fff; 
+            color: #000; 
+            font-size: 12pt; 
+            line-height: 1.3;
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+        .recipe-container {
+            display: flex;
+            flex-direction: column; 
+            width: 100%; 
         }
 
-        h2 {
-            font-size: 20px;
-            margin-top: 20px;
-            margin-bottom: 10px;
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px; 
         }
 
-        p {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+        .header .logo {
+            order: 1;
+            margin-right: 10px; 
         }
 
-        ul,
-        ol {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+        .header .logo img {
+            height: 50px; 
+            width: auto;
         }
 
-        img {
-            max-width: 100%;
+        .header h1 {
+            font-size: 1.5em; 
+            margin: 0;
+            margin-left: auto; 
+        }
+
+        .recipe-details-wrapper {
+            display: flex; 
+            margin-bottom: 20px; 
+        }
+
+        .recipe-image { 
+            margin-right: 20px; 
+        }
+
+        .recipe-image img {
+            display: block;
+            width: 100%;
             height: auto;
-            margin-bottom: 10px;
+            max-height: 300px; 
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .recipe-info {
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .recipe-info p {
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .tags-container p.recipe-tag,
+        .tags-container p.no-tags {
+            background-color: #eee; 
+            color: #333; 
+            padding: 3px 6px;
+            border-radius: 10px;
+            margin: 3px;
+            display: inline-block;
+            font-size: 0.9em; 
+        }
+
+        .recipe-steps {
+            width: 100%; 
+            margin-top: 20px;
+        }
+
+        .recipe-steps h3 {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 3px;
+        }
+
+        .recipe-steps ol {
+            padding-left: 20px;
+        }
+
+        .recipe-steps ol li {
+            font-size: 1em;
+            margin-bottom: 5px;
         }
     </style>
 </head>
 
 <body>
-    <h1>{{ recipe.title }}</h1>
-    {% if image_url %}
-    <img src="{{ image_url }}" alt="{{ recipe.title }}">
-    {% endif %}
-    <p>{{ recipe.description }}</p>
-    <p>Tiempo requerido: {{ recipe.time_required }}</p>
-    <p>Porciones: {{ recipe.servings }}</p>
-    <p>Calificación: {{ recipe.calification }}</p>
+    <div class="recipe-container">
+        <header class="header">
+            <div class="logo">
+                <img src="{{ logo_url }}">
+            </div>
+            <h1>{{ recipe.title }}</h1>
+        </header>
 
-    <h2>Ingredientes</h2>
-    <ul>
-        {% for ingredient in recipe.recipeingredient_set.all %}
-        <li>{{ ingredient.quantity }} {{ ingredient.get_measurement_display }} de {{ ingredient.ingredient.name }}</li>
-        {% endfor %}
-    </ul>
+        <div class="recipe-details-wrapper">
+            <div class="recipe-image">
+                {% if image_url %}
+                <img src="{{ image_url }}" alt="{{ recipe.title }}">
+                {% endif %}
+            </div>
+            <div class="recipe-info">
+                <p>{{ recipe.description }}</p>
+                <p>Dificultad: {{ recipe.difficulty }}</p>
+                <p>Tiempo requerido: {{ recipe.time_required }}</p>
+                <p>Porciones: {{ recipe.servings }}</p>
+                <p>Autor: {{ recipe.author.username }}</p>
+                <div class="tags-container">
+                    {% for tag in recipe.tags.all %}
+                    <p class="recipe-tag">{{ tag.name }}</p>
+                    {% empty %}
+                    <p class="no-tags">Sin etiquetas</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
-    <h2>Pasos</h2>
-    <ol>
-        {% for step in recipe.steps.all %}
-        <li>{{ step.description }}</li>
-        {% endfor %}
-    </ol>
+        <div class="recipe-steps">
+            <h3>Pasos:</h3>
+            <ol>
+                {% for step in recipe.steps.all %}
+                <li>{{ step.description }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
 </body>
 
 </html>

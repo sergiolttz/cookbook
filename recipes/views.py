@@ -11,6 +11,8 @@ import datetime
 from django.forms import formset_factory
 from django import template
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.staticfiles.storage import staticfiles_storage
+
 
 def home(request):
     """Vista para la página de inicio."""
@@ -323,12 +325,12 @@ def recipe_pdf(request, pk):
     """Vista para generar un PDF de la receta."""
     recipe = get_object_or_404(Recipe, pk=pk)
 
-    # Generar la URL absoluta de la imagen
     image_url = request.build_absolute_uri(recipe.image.url) if recipe.image else None
+    logo_url = request.build_absolute_uri(staticfiles_storage.url('images/logo.png'))
 
-    html_string = render_to_string('recipe-pdf.html', {'recipe': recipe, 'image_url': image_url})
+    html_string = render_to_string('recipe-pdf.html', {'recipe': recipe, 'image_url': image_url, 'logo_url': logo_url})
 
-    config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')  # Reemplaza con la ruta correcta
+    config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
     options = {
         'encoding': 'UTF-8',
     }
