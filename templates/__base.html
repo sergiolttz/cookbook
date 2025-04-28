@@ -19,8 +19,7 @@
     <header class="header">
         {% if request.path != '/recipes/' %}
             <div class="logo">
-                <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook">
-                </a>
+                <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook"></a>
             </div>
         {% endif %}
     

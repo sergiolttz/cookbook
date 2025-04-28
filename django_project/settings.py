@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -165,3 +168,11 @@ ACCOUNT_PASSWORD_SET_TEMPLATE = os.path.join('account', 'password_set.html')
 ACCOUNT_EMAIL_TEMPLATE = os.path.join('account', 'email.html')
 SOCIALACCOUNT_ENABLED = True
 
+# Configuración de MailerSend (SMTP)
+DEFAULT_FROM_EMAIL = 'noreply@test-pzkmgq778e2l059v.mlsender.net'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mailersend.net'
+EMAIL_PORT = 587  
+EMAIL_HOST_USER = 'MS_UxpGnM@test-pzkmgq778e2l059v.mlsender.net' 
+EMAIL_HOST_PASSWORD = os.environ.get('MAILERSEND_API_KEY')
+EMAIL_USE_TLS = True 
