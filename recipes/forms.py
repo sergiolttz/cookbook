@@ -2,6 +2,9 @@ from django import forms
 from .models import Recipe, RecipeIngredient, Rating, UserProfile
 from .widgets import RecipeDurationWidget
 import datetime
+from django.contrib.auth.forms import PasswordChangeForm
+
+
 
 class RecipeForm(forms.ModelForm):
     time_required = forms.DurationField(widget=RecipeDurationWidget())
@@ -10,6 +13,10 @@ class RecipeForm(forms.ModelForm):
         model = Recipe
         fields = ['title', 'description', 'image', 'time_required', 'servings']
         exclude = ['ingredients'] #Mantener solo esta definición, que excluye ingredients
+        widgets = {
+            'image': forms.FileInput(attrs={'id': 'upload-button', 'style': 'display: none;'}),
+        }
+
 
     def clean_time_required(self):
         time_required = self.cleaned_data['time_required']
@@ -60,3 +67,20 @@ class UserProfileForm(forms.ModelForm):
             user.email = self.cleaned_data['email']
             user.save()
         return user_profile
+    
+class CustomPasswordChangeForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='Contraseña actual'
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='Nueva contraseña'
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='Confirmar nueva contraseña'
+    )
+
+    class Meta:
+        fields = ['old_password', 'new_password1', 'new_password2']

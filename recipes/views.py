@@ -12,7 +12,10 @@ from django.forms import formset_factory
 from django import template
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.staticfiles.storage import staticfiles_storage
-
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
+from .forms import UserProfileForm, CustomPasswordChangeForm 
 
 def home(request):
     """Vista para la página de inicio."""
@@ -75,7 +78,7 @@ def recipe_list(request):
     query = request.GET.get('q')
     sort_by = request.GET.get('sort')
     order = request.GET.get('order', 'asc')
-    selected_tags = request.GET.getlist('tags')  # Obtener las etiquetas seleccionadas
+    selected_tags = request.GET.getlist('tags')
 
     recipes = Recipe.objects.all()
 
@@ -104,16 +107,14 @@ def recipe_list(request):
             recipes = recipes.annotate(ingredient_count=Count('recipeingredient')).order_by('-ingredient_count')
 
     # Paginación
-    paginator = Paginator(recipes, 9)  # Mostrar 9 recetas por página
+    paginator = Paginator(recipes, 9) 
     page = request.GET.get('page')
 
     try:
         recipes_page = paginator.page(page)
     except PageNotAnInteger:
-        # Si page no es un entero, entrega la primera página.
         recipes_page = paginator.page(1)
     except EmptyPage:
-        # Si page está fuera de rango (ej. 9999), entrega la última página.
         recipes_page = paginator.page(paginator.num_pages)
 
     # Calcula la calificación promedio para las recetas en la página actual
@@ -204,7 +205,7 @@ def recipe_create(request):
             recipe.author = request.user
             recipe.save()
 
-            # Guardar ingredientes y pasos (como antes)
+            # Guardar ingredientes y pasos 
             for ingredient_form in ingredient_formset:
                 if ingredient_form.cleaned_data and ingredient_form.cleaned_data.get('ingredient_name'):
                     ingredient, created = Ingredient.objects.get_or_create(name=ingredient_form.cleaned_data['ingredient_name'])
@@ -348,10 +349,20 @@ def user_profile(request, username):
     created_recipes = Recipe.objects.filter(author=user)
     favorite_recipes = user_profile.favorite_recipes.all()
 
+    created_recipes_with_rating = []
+    for recipe in created_recipes:
+        average_rating = recipe.rating_set.aggregate(Avg('rating'))['rating__avg']
+        created_recipes_with_rating.append({'recipe': recipe, 'avg_rating': average_rating})
+
+    favorite_recipes_with_rating = []
+    for recipe in favorite_recipes:
+        average_rating = recipe.rating_set.aggregate(Avg('rating'))['rating__avg']
+        favorite_recipes_with_rating.append({'recipe': recipe, 'avg_rating': average_rating})
+
     context = {
         'user_profile': user_profile,
-        'created_recipes': created_recipes,
-        'favorite_recipes': favorite_recipes,
+        'created_recipes': created_recipes_with_rating,
+        'favorite_recipes': favorite_recipes_with_rating,
     }
 
     return render(request, 'user-profile.html', context)
@@ -374,24 +385,40 @@ def remove_favorite(request, recipe_id):
 
 @login_required
 def edit_profile(request):
-    """Vista para editar el perfil del usuario."""
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    profile_form = UserProfileForm(instance=user_profile)
+    password_form = CustomPasswordChangeForm(request.user)
+
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-        if form.is_valid():
-            form.save()
-            return redirect('user_profile', username=request.user.username)
-    else:
-        form = UserProfileForm(instance=user_profile)
+        if 'save_profile' in request.POST:
+            profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, 'Tu perfil ha sido actualizado exitosamente.')
+                return redirect('edit_profile')
+            else:
+                messages.error(request, 'Por favor, corrige los errores en el perfil.')
+        elif 'change_password' in request.POST:
+            password_form = CustomPasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Tu contraseña ha sido cambiada exitosamente.')
+                return redirect('edit_profile')
+            else:
+                messages.error(request, 'Por favor, corrige los errores en la contraseña.')
 
-    user_profile = None  # Inicializa user_profile
-    if request.user.is_authenticated:
-        try:
-            user_profile = UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
-            pass
+    user_profile_for_context = None
+    try:
+        user_profile_for_context = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        pass
 
-    return render(request, 'edit-profile.html', {'form': form, 'user_profile': user_profile})
+    return render(request, 'edit-profile.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'user_profile': user_profile_for_context,
+    })
 
 @login_required
 def deactivate_account(request):
@@ -416,3 +443,4 @@ def deactivate_account(request):
         except UserProfile.DoesNotExist:
             pass
     return render(request, 'edit-profile.html', {'user_profile': user_profile})
+

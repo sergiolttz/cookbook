@@ -1,60 +1,113 @@
 {% extends '__base.html' %}
 {% block content %}
-<h1>Crear Receta</h1>
+<div class="create-recipe-container">
+    <h1>Crear Receta</h1>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    <h2>Etiquetas</h2>
-    <div>
-        {% for tag_type in tag_types %}
-        <button type="button" class="tag-type-button" data-tag-type="{{ tag_type }}">{{ tag_type }}</button>
-        {% endfor %}
-    </div>
+        <div class="form-group">
+            {{ form.title.errors }}
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+        </div>
 
-    <div id="tag-selection-container">
-        {% for tag_type in tag_types %}
-        <div class="tag-type-section" id="tag-section-{{ tag_type }}" style="display: none;">
-            <h3>{{ tag_type }}</h3>
-            {% for tag in all_tags %}
-            {% if tag.tag_type == tag_type %}
-            <label>
-                <input type="checkbox" name="tags" value="{{ tag.id }}"> {{ tag.name }}
-            </label><br>
-            {% endif %}
+        <div class="form-group">
+            {{ form.description.errors }}
+            <label for="{{ form.description.id_for_label }}">Descripción:</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group file-upload-wrapper">
+            <label for="upload-button" class="upload-button">Seleccionar Archivo</label>
+            {{ form.image }}
+            <span id="file-name"></span>
+            {{ form.image.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.time_required.errors }}
+            <label for="{{ form.time_required.id_for_label }}">Tiempo requerido:</label>
+            {{ form.time_required }}
+        </div>
+
+        <div class="form-group">
+            {{ form.servings.errors }}
+            <label for="{{ form.servings.id_for_label }}">Porciones:</label>
+            {{ form.servings }}
+        </div>
+
+        <h2>Etiquetas</h2>
+        <div>
+            {% for tag_type in tag_types %}
+            <button type="button" class="tag-type-button" data-tag-type="{{ tag_type }}">{{ tag_type }}</button>
             {% endfor %}
         </div>
-        {% endfor %}
-    </div>
 
-    <h2>Ingredientes</h2>
-    <div id="ingredient-formset-container">
-        {{ ingredient_formset.management_form }}
-        {% for ingredient_form in ingredient_formset %}
-        <div class="ingredient-form">
-            {{ ingredient_form.as_p }}
-            <button type="button" class="remove-ingredient">Eliminar Ingrediente</button>
+        <div id="tag-selection-container">
+            {% for tag_type in tag_types %}
+            <div class="tag-type-section" id="tag-section-{{ tag_type }}" style="display: none;">
+                <h3>{{ tag_type }}</h3>
+                {% for tag in all_tags %}
+                {% if tag.tag_type == tag_type %}
+                <label>
+                    <input type="checkbox" name="tags" value="{{ tag.id }}"> {{ tag.name }}
+                </label><br>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>        
+        <h2>Ingredientes</h2>
+        <div id="ingredient-formset-container">
+            {{ ingredient_formset.management_form }}
+            {% for ingredient_form in ingredient_formset %}
+            <div class="ingredient-form">
+                <div class="form-group">
+                    {{ ingredient_form.ingredient_name.errors }}
+                    <label for="{{ ingredient_form.ingredient_name.id_for_label }}">Nombre del ingrediente:</label>
+                    {{ ingredient_form.ingredient_name }}
+                </div>
+                <div class="form-group">
+                    {{ ingredient_form.ingredient_quantity.errors }}
+                    <label for="{{ ingredient_form.ingredient_quantity.id_for_label }}">Cantidad:</label>
+                    {{ ingredient_form.ingredient_quantity }}
+                </div>
+                <div class="form-group">
+                    {{ ingredient_form.ingredient_measurement.errors }}
+                    <label for="{{ ingredient_form.ingredient_measurement.id_for_label }}">Medida:</label>
+                    {{ ingredient_form.ingredient_measurement }}
+                </div>
+                <button type="button" class="remove-ingredient">Eliminar Ingrediente</button>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    <button type="button" id="add-ingredient">Agregar Ingrediente</button>
+        <button type="button" id="add-ingredient">Agregar Ingrediente</button>
 
-    <h2>Pasos</h2>
-    <div id="step-formset-container">
-        {{ step_formset.management_form }}
-        {% for step_form in step_formset %}
-        <div class="step-form">
-            {{ step_form.as_p }}
-            <button type="button" class="remove-step">Eliminar Paso</button>
+        <h2>Pasos</h2>
+        <div id="step-formset-container">
+            {{ step_formset.management_form }}
+            {% for step_form in step_formset %}
+            <div class="step-form">
+                <div class="form-group">
+                    {{ step_form.step_description.errors }}
+                    <label for="{{ step_form.step_description.id_for_label }}">Descripción del paso:</label>
+                    {{ step_form.step_description }}
+                </div>
+                <button type="button" class="remove-step">Eliminar Paso</button>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    <button type="button" id="add-step">Agregar Paso</button>
+        <button type="button" id="add-step">Agregar Paso</button>
 
-    <button type="submit">Guardar Receta</button>
-    <a href="{% url 'recipes-list' %}"><button type="button">Cancelar</button></a>
-</form>
+        <div class="form-actions">
+            <button type="submit">Guardar Receta</button>
+            <a href="{% url 'recipes-list' %}"><button type="button">Cancelar</button></a>
+        </div>
+    </form>
+</div>
+
+{% include 'footer.html' %}
 
 <script>
     document.querySelectorAll('.tag-type-button').forEach(button => {
@@ -69,21 +122,48 @@
     const ingredientFormsetContainer = document.getElementById('ingredient-formset-container');
     const ingredientFormsetPrefix = '{{ ingredient_formset.prefix }}';
     let ingredientFormCount = parseInt('{{ ingredient_formset.total_form_count }}');
-    const ingredientEmptyFormHtml = `{{ ingredient_empty_form_html|escapejs }}`.replace(/__prefix__/g, ingredientFormCount);
+
+    // Renderizar las opciones del selector de unidades en la plantilla
+    const measurementChoicesHtml = `
+        <option value="" selected="">---------</option>
+        {% for choice in ingredient_formset.forms.0.fields.ingredient_measurement.choices %}
+        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+        {% endfor %}
+    `;
+
+    const ingredientEmptyFormHtml = `
+        <div class="ingredient-form">
+            <div class="form-group">
+                <label for="id_ingredients-__prefix__-ingredient_name">Nombre del ingrediente:</label>
+                <input type="text" name="ingredients-__prefix__-ingredient_name" maxlength="100" id="id_ingredients-__prefix__-ingredient_name">
+            </div>
+            <div class="form-group">
+                <label for="id_ingredients-__prefix__-ingredient_quantity">Cantidad:</label>
+                <input type="number" name="ingredients-__prefix__-ingredient_quantity" step="0.01" id="id_ingredients-__prefix__-ingredient_quantity">
+            </div>
+            <div class="form-group">
+                <label for="id_ingredients-__prefix__-ingredient_measurement">Medida:</label>
+                <select name="ingredients-__prefix__-ingredient_measurement" id="id_ingredients-__prefix__-ingredient_measurement">
+                    ${measurementChoicesHtml}
+                </select>
+            </div>
+        </div>
+    `;
 
     addIngredientButton.addEventListener('click', function () {
-        const newForm = document.createElement('div');
-        newForm.innerHTML = ingredientEmptyFormHtml.replace(/__prefix__/g, ingredientFormCount);
-        ingredientFormsetContainer.appendChild(newForm);
+        const newFormWrapper = document.createElement('div'); // Crear el div envolvente
+        newFormWrapper.classList.add('ingredient-form'); // Añadir la clase para los estilos
+        newFormWrapper.innerHTML = ingredientEmptyFormHtml.replace(/__prefix__/g, ingredientFormCount);
+        ingredientFormsetContainer.appendChild(newFormWrapper);
         ingredientFormCount++;
         document.getElementById('id_ingredients-TOTAL_FORMS').value = ingredientFormCount;
 
-        // Agregar el botón de eliminar al nuevo formulario
+        // Agregar el botón de eliminar al nuevo formulario (ahora dentro del wrapper)
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
         removeButton.textContent = 'Eliminar Ingrediente';
         removeButton.classList.add('remove-ingredient');
-        newForm.appendChild(removeButton);
+        newFormWrapper.appendChild(removeButton);
     });
 
     // Agregar un nuevo formulario de paso al hacer clic en el botón
@@ -91,21 +171,29 @@
     const stepFormsetContainer = document.getElementById('step-formset-container');
     const stepFormsetPrefix = '{{ step_formset.prefix }}';
     let stepFormCount = parseInt('{{ step_formset.total_form_count }}');
-    const stepEmptyFormHtml = `{{ step_empty_form_html|escapejs }}`.replace(/__prefix__/g, stepFormCount);
+    const stepEmptyFormHtml = `
+        <div class="step-form">
+            <div class="form-group">
+                <label for="id_steps-__prefix__-step_description">Descripción del paso:</label>
+                <textarea name="steps-__prefix__-step_description" cols="30" rows="3" id="id_steps-__prefix__-step_description"></textarea>
+            </div>
+        </div>
+    `;
 
     addStepButton.addEventListener('click', function () {
-        const newForm = document.createElement('div');
-        newForm.innerHTML = stepEmptyFormHtml.replace(/__prefix__/g, stepFormCount);
-        stepFormsetContainer.appendChild(newForm);
+        const newFormWrapper = document.createElement('div'); // Crear el div envolvente
+        newFormWrapper.classList.add('step-form'); // Añadir la clase para los estilos
+        newFormWrapper.innerHTML = stepEmptyFormHtml.replace(/__prefix__/g, stepFormCount);
+        stepFormsetContainer.appendChild(newFormWrapper);
         stepFormCount++;
         document.getElementById('id_steps-TOTAL_FORMS').value = stepFormCount;
 
-        // Agregar el botón de eliminar al nuevo formulario
+        // Agregar el botón de eliminar al nuevo formulario (ahora dentro del wrapper)
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
         removeButton.textContent = 'Eliminar Paso';
         removeButton.classList.add('remove-step');
-        newForm.appendChild(removeButton);
+        newFormWrapper.appendChild(removeButton);
     });
 
     // Eliminar ingredientes y pasos al hacer clic en los botones de eliminar
@@ -122,6 +210,32 @@
             event.target.parentElement.remove();
             stepFormCount--;
             document.getElementById('id_steps-TOTAL_FORMS').value = stepFormCount;
+        }
+    });
+
+    // JavaScript para la previsualización de la imagen
+    const imageInput = document.querySelector('input[type="file"][name="image"]'); // Ajusta el selector si es necesario
+    const imagePreviewContainer = document.createElement('div'); // Crear un contenedor para la vista previa
+    imagePreviewContainer.style.marginTop = '10px';
+    const imagePreview = document.createElement('img');
+    imagePreview.style.maxWidth = '200px';
+    imagePreview.style.maxHeight = '200px';
+    imagePreview.style.display = 'none'; // Inicialmente oculto
+    imagePreviewContainer.appendChild(imagePreview);
+    imageInput.parentNode.insertBefore(imagePreviewContainer, imageInput.nextSibling); // Insertar después del input de archivo
+
+    imageInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block'; // Mostrar la vista previa
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.src = '';
+            imagePreview.style.display = 'none'; // Ocultar si no hay archivo seleccionado
         }
     });
 </script>

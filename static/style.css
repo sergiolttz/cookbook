@@ -580,8 +580,8 @@ body {
     color: var(--negro);
     background-color: var(--blanco);
     }
-    
-.filter-section .button[type="submit"] {
+ 
+.filter-section button.filter-button {
     background-color: var(--secundario);
     color: var(--blanco);
     padding: 12px 25px;
@@ -592,11 +592,12 @@ body {
     margin-top: 20px;
     width: 100%;
     box-sizing: border-box;
-    }
-    
-.filter-section button[type="submit"]:hover {
-    background-color: var(--secundarioOscuro);
 }
+
+.filter-section button.filter-button:hover {
+    background-color: var(--terciarioOscuro);
+}
+
     
 .filter-controls-container {
         display: flex;
@@ -782,6 +783,13 @@ body {
     line-height: 1.6;
     margin-bottom: 10px;
 }
+.recipe-rating-section a {
+    text-decoration: none;
+    color: var(--secundario);
+}
+.recipe-rating-section a:hover {
+    color: var(--secundarioOscuro);
+}
 .recipe-actions {
     margin-top: 15px;
     display: flex;
@@ -954,24 +962,6 @@ body {
     text-decoration: none;
 }
 
-
-/* Estilos para pantallas más pequeñas (opcional, para hacerlo responsive) */
-@media (max-width: 768px) {
-    .recipe-detail-container {
-        padding: 15px;
-    }
-
-    .recipe-main-content {
-        flex-direction: column; /* Apila la calificación y los detalles en pantallas pequeñas */
-        gap: 20px;
-    }
-
-    .recipe-rating-section {
-        width: 100%; /* Ocupa todo el ancho en pantallas pequeñas */
-        flex-basis: auto;
-    }
-}
-
 /* Estilos para el formulario de calificación con estrellas */
 .rating-form {
     margin-bottom: 20px;
@@ -1036,13 +1026,10 @@ body {
     color: var(--negro);
     padding: 30px;
     margin: 30px auto;
-    /* Centrar el contenedor */
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     width: 80%;
-    /* Ajustar el ancho según sea necesario */
     max-width: 600px;
-    /* Ancho máximo opcional */
     text-align: center;
 }
 
@@ -1059,12 +1046,10 @@ body {
 
 .delete-recipe-container form {
     display: inline-block;
-    /* Para que los elementos del formulario estén en línea */
 }
 
 .delete-recipe-container button[type="submit"] {
     background-color: #dc3545;
-    /* Rojo para indicar eliminación */
     color: var(--blanco);
     padding: 12px 25px;
     border: none;
@@ -1091,4 +1076,777 @@ body {
 
 .delete-recipe-container a:hover {
     background-color: var(--grisClaro);
+}
+
+/*Estilos para recipe-create*/
+.create-recipe-container {
+    background-color: var(--blanco);
+    color: var(--negro);
+    padding: 30px;
+    margin: 30px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.create-recipe-container h1 {
+    color: var(--negro);
+    margin-bottom: 20px;
+}
+
+.create-recipe-container h2 {
+    color: var(--primarioOscuro);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--grisMedio);
+    padding-bottom: 10px;
+}
+
+.create-recipe-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--negro);
+}
+
+.form-group {
+    margin-bottom: 15px;
+    /* Añade espacio entre los grupos de formulario */
+}
+
+/* Estilos para los campos de tipo número dentro de .form-group */
+.form-group>label+input[type="number"],
+.form-group>input[type="number"][name="time_required_0"],
+.form-group>input[type="number"][name="time_required_1"] {
+    padding: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--negro);
+    background-color: var(--grisClaro);
+    display: inline-block;
+    width: auto;
+    max-width: 80px;
+    box-sizing: border-box;
+    /* Asegura que padding y border no aumenten el ancho total */
+}
+
+/* Ajuste para que Horas y Minutos estén en la misma línea */
+.form-group:has(label[for="id_time_required_0"]) {
+    display: flex;
+    gap: 10px;
+    /* Espacio entre horas y minutos */
+    align-items: center;
+    /* Alinea verticalmente la etiqueta y los inputs */
+}
+
+.form-group:has(label[for="id_time_required_0"])>label {
+    flex-shrink: 0;
+    /* Evita que la etiqueta se encoja */
+    margin-right: 10px;
+    /* Espacio entre la etiqueta y los inputs */
+}
+
+.form-group:has(label[for="id_time_required_0"])>input[name="time_required_0"],
+.form-group:has(label[for="id_time_required_1"])>input[name="time_required_1"] {
+    width: calc(50% - 20px);
+    /* Ajusta el ancho teniendo en cuenta el gap */
+    max-width: none;
+}
+
+/* Estilos para otros inputs dentro de .form-group */
+.form-group>label+input[type="text"],
+.form-group>label+input[type="file"],
+.form-group>label+textarea,
+.form-group>label+select {
+    padding: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--negro);
+    background-color: var(--grisClaro);
+    box-sizing: border-box;
+    display: block;
+    width: calc(100% - 22px);
+}
+
+.create-recipe-container .form-group>p>textarea {
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--negro);
+    background-color: var(--grisClaro);
+    box-sizing: border-box;
+    display: block;
+    width: calc(100% - 22px);
+}
+
+.form-group>label+textarea {
+    min-height: 100px;
+}
+
+/* Estilos específicos para el contenedor del botón de carga de archivos */
+.file-upload-wrapper {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.file-upload-wrapper>label.upload-button {
+    background-color: var(--primario);
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.file-upload-wrapper>label.upload-button:hover {
+    background-color: var(--primarioOscuro);
+}
+
+.file-upload-wrapper>input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-wrapper>span#file-name {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: var(--negro);
+}
+
+/* Estilos para los botones de tipo de etiqueta */
+.create-recipe-container .tag-type-button {
+    background-color: var(--secundario);
+    color: var(--blanco);
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.create-recipe-container .tag-type-button:hover {
+    background-color: var(--secundarioOscuro);
+}
+
+/* Estilos para las secciones de etiquetas */
+.create-recipe-container .tag-type-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    background-color: var(--grisClaro);
+}
+
+.create-recipe-container .tag-type-section h3 {
+    color: var(--primario);
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--grisMedio);
+    padding-bottom: 5px;
+}
+
+.create-recipe-container .tag-type-section label {
+    font-weight: normal;
+    margin-left: 5px;
+}
+
+.create-recipe-container .tag-type-section input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+/* Estilos para los formularios de ingredientes y pasos */
+.create-recipe-container .ingredient-form,
+.create-recipe-container .step-form {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--grisClaro);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.create-recipe-container .ingredient-form h3,
+.create-recipe-container .step-form h3 {
+    color: var(--primario);
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--grisMedio);
+    padding-bottom: 5px;
+}
+
+.create-recipe-container .ingredient-form label,
+.create-recipe-container .step-form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--negro);
+}
+
+.create-recipe-container .ingredient-form input[type="text"],
+.create-recipe-container .ingredient-form input[type="number"],
+.create-recipe-container .step-form textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--negro);
+    background-color: var(--blanco);
+}
+
+.create-recipe-container .remove-ingredient,
+.create-recipe-container .remove-step {
+    background-color: #dc3545;
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.create-recipe-container .remove-ingredient:hover,
+.create-recipe-container .remove-step:hover {
+    background-color: #c82333;
+}
+
+/* Estilos para los botones de agregar ingrediente/paso */
+.create-recipe-container #add-ingredient,
+.create-recipe-container #add-step {
+    background-color: var(--primario);
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.create-recipe-container #add-ingredient:hover,
+.create-recipe-container #add-step:hover {
+    background-color: var(--primarioOscuro);
+}
+
+/* Estilos para los botones de guardar y cancelar */
+.create-recipe-container>form>div.form-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.create-recipe-container button[type="submit"],
+.create-recipe-container a button[type="button"] {
+    background-color: var(--secundario);
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-grow: 1;
+    display: block;
+    text-align: center;
+}
+
+.create-recipe-container button[type="submit"]:hover,
+.create-recipe-container a button[type="button"]:hover {
+    background-color: var(--secundarioOscuro);
+}
+
+/*Estilos para user-profile*/
+.profile-detail-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 30px;
+    box-sizing: border-box;
+    background-color: var(--blanco);
+    color: var(--negro);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.profile-detail-header {
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-detail-header img {
+    width: 300px;
+    height: 300px;
+    border-radius: 150px;
+    object-fit: cover;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-details-section {
+    flex: 1;
+    padding-top: 0;
+    text-align: center;
+}
+
+.profile-details-section .button {
+    color: var(--blanco);
+    padding: 12px 25px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    text-align: center;
+    min-width: auto;
+    background-color: var(--primario);
+    transition: background-color 0.3s ease;
+}
+
+.profile-details-section .button:hover {
+    background-color: var(--primarioOscuro);
+}
+
+/*Estilos para login, signup, logout*/
+.account-container {
+    background-color: var(--blanco);
+    width: 80%;
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: var(--negro);
+}
+.account-title {
+    color: var(--negro);
+    margin-bottom: 20px;
+}
+
+.account-container-link {
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.account-container-link .link {
+    color: var(--secundario);
+    text-decoration: none;
+}
+
+.account-container-link .link:hover {
+    color: var(--secundarioOscuro);
+}
+
+.account-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--negro);
+    font-weight: bold;
+    text-align: left;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 1em;
+    color: var(--negro);
+    box-sizing: border-box;
+}
+
+.form-actions {
+    margin-top: 20px;
+}
+
+.forgot-password{
+    color: var(--secundario);
+    display: block;
+    margin-top: 10px;
+}
+.forgot-password:hover {
+    color: var(--secundarioOscuro);
+}
+
+.boton-principal {
+    background-color: var(--primario);
+    color: var(--blanco);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.boton-principal:hover {
+    background-color: var(--primarioOscuro);
+}
+
+.login-options {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.login-options .button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-decoration: none;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-options .passkey-login-btn {
+    background-color: var(--grisClaro);
+    color: var(--negro);
+    border: 1px solid var(--grisMedio);
+    transition: background-color 0.3s ease;
+}
+
+.login-options .passkey-login-btn:hover {
+    background-color: var(--blanco);
+}
+
+.login-options .login-code-link {
+    color: var(--secundario);
+    text-decoration: underline;
+}
+
+.social-login {
+    margin-top: 30px;
+    border-top: 1px solid var(--grisMedio);
+    padding-top: 20px;
+}
+
+.social-title {
+    color: var(--negro);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.socialaccount_providers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.socialaccount_providers button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-decoration: none;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/*Estilos para signup.html*/
+.signup-container {
+    background-color: var(--blanco);
+    width: 80%;
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: var(--negro);
+}
+
+.signup-title {
+    color: var(--primario);
+    margin-bottom: 20px;
+}
+
+.signup-link {
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.signup-link .link {
+    color: var(--secundario);
+    text-decoration: none;
+}
+
+.signup-link .link:hover {
+    color: var(--secundarioOscuro);
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--negro);
+}
+
+.form-group input[type="email"],
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 1em;
+    color: var(--negro);
+    box-sizing: border-box;
+}
+
+.form-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.boton-principal {
+    background-color: var(--primario);
+    color: var(--blanco);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.boton-principal:hover {
+    background-color: var(--primarioOscuro);
+}
+
+.social-login {
+    margin-top: 30px;
+    border-top: 1px solid var(--grisMedio);
+    padding-top: 20px;
+}
+
+.social-title {
+    color: var(--negro);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+/* Estilos para la página de edición de perfil */
+.edit-profile-container {
+    background-color: var(--blanco);
+    color: var(--negro);
+    padding: 30px;
+    margin: 30px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.edit-profile-container h2 {
+    color: var(--primarioOscuro);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--grisMedio);
+    padding-bottom: 10px;
+}
+
+.edit-profile-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--negro);
+}
+
+.edit-profile-container input[type="text"],
+.edit-profile-container input[type="file"],
+.edit-profile-container input[type="email"],
+.edit-profile-container input[type="password"] {
+    padding: 10px;
+    border: 1px solid var(--grisMedio);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--negro);
+    background-color: var(--grisClaro);
+    box-sizing: border-box;
+    width: calc(100% - 22px);
+    margin-bottom: 15px;
+}
+
+.edit-profile-container button[type="submit"] {
+    background-color: var(--primario);
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.edit-profile-container button[type="submit"]:hover {
+    background-color: var(--primarioOscuro);
+}
+
+.edit-profile-container hr {
+    border: 1px solid var(--grisMedio);
+    margin: 20px 0;
+}
+
+/* Estilos para el área de desactivar cuenta */
+.desactivar-cuenta {
+    border: none;
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 5px;
+    background-color: #ffe0e0;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.desactivar-cuenta h2 {
+    color: red;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.desactivar-cuenta p {
+    color: #842029;
+    /* Un rojo oscuro para el texto de advertencia */
+    margin-bottom: 15px;
+}
+
+.desactivar-cuenta button#desactivarCuentaBtn {
+    background-color: red;
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.desactivar-cuenta button#desactivarCuentaBtn:hover {
+    background-color: #c82333;
+}
+
+/* Estilos para el formulario de confirmación de desactivación */
+#confirmarDesactivacion {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #f0ad4e;
+    border-radius: 5px;
+    background-color: #fffacd;
+}
+
+#confirmarDesactivacion label {
+    font-weight: bold;
+    color: #8a6d3b;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#confirmarDesactivacion input[type="password"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: 1px solid #f0ad4e;
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--negro);
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+#confirmarDesactivacion button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#confirmarDesactivacion button[type="submit"] {
+    background-color: #d9534f;
+   color: var(--blanco);
+    margin-right: 10px;
+}
+
+#confirmarDesactivacion button[type="submit"]:hover {
+    background-color: #c9302c;
+}
+
+#confirmarDesactivacion button#cancelarDesactivacion {
+    background-color: var(--grisMedio);
+    color: var(--negro);
+}
+
+#confirmarDesactivacion button#cancelarDesactivacion:hover {
+    background-color: var(--grisClaro);
+}
+
+/* Estilo para el botón de volver al perfil */
+.volver-perfil-btn {
+    display: block;
+    margin-top: 20px;
+    background-color: var(--secundario);
+    color: var(--blanco);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.volver-perfil-btn:hover {
+    background-color: var(--secundarioOscuro);
 }

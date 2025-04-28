@@ -18,30 +18,31 @@
 <body>
     <header class="header">
         {% if request.path != '/recipes/' %}
-        <div class="logo">
-            <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook">
-            </a>
-        </div>
+            <div class="logo">
+                <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook">
+                </a>
+            </div>
         {% endif %}
+    
         {% if request.path != '/recipes/' and request.path != '/recipes/list/' %}
-        <div class="header-search-bar">
-            <form class="search-form" method="get" action="{% url 'recipes-list' %}">
-                <input type="text" name="q" placeholder="Buscar recetas...">
-                <button type="submit" class="search-button">Buscar</button>
-            </form>
-        </div>
+            <div class="header-search-bar">
+                <form class="search-form" method="get" action="{% url 'recipes-list' %}">
+                    <input type="text" name="q" placeholder="Buscar recetas...">
+                    <button type="submit" class="search-button">Buscar</button>
+                </form>
+            </div>
         {% endif %}
-        
+    
         <div class="profile-info">
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and logged_in_user_profile %}
             <div class="profile-dropdown">
                 <div class="profile-icon">
-                    <img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil" id="profile-toggle">
+                    <img src="{{ logged_in_user_profile.profile_picture.url }}" alt="Foto de perfil" id="profile-toggle">
                 </div>
                 <div class="dropdown-content" id="profile-menu">
                     <div class="dropdown-header">
                         <div class="profile-icon-dropdown">
-                            <img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil">
+                            <img src="{{ logged_in_user_profile.profile_picture.url }}" alt="Foto de perfil">
                         </div>
                         <p>Hola <strong>{{ user.username }}</strong></p>
                     </div>
@@ -50,16 +51,17 @@
                 </div>
             </div>
             {% else %}
-            <p><a class="button header-btn" href="{% url 'account_login' %}">Iniciar Sesión</a>  <a class="button header-btn" href="{% url 'account_signup' %}">Registrarse</a>
-            </p>
+                <p> <a class="button header-btn" href="{% url 'account_login' %}">Iniciar Sesión</a>
+                    <a class="button header-btn" href="{% url 'account_signup' %}">Registrarse</a>
+                </p>
             {% endif %}
         </div>
         {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li class="message {% if message.tags %} {{ message.tags }} {% endif %}">{{ message }}</li>
-            {% endfor %}
-        </ul>
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="message {% if message.tags %} {{ message.tags }} {% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
     </header>
     <div>

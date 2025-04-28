@@ -1,45 +1,42 @@
-{% extends "account/base_entrance.html" %}
-{% load allauth i18n %}
-{% block head_title %}
-    {% trans "Signup" %}
-{% endblock head_title %}
+{% extends '__base.html' %}
+{% load i18n %}
+{% load allauth account %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign Up" %}
-    {% endelement %}
-    {% setvar link %}
-        <a href="{{ login_url }}">
-        {% endsetvar %}
-        {% setvar end_link %}
-        </a>
-    {% endsetvar %}
-    {% element p %}
-        {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
-    {% endelement %}
+<div class="account-container">
+    <h1 class="account-title">Registrarse</h1>
+
+    <p class="account-container-link">¿Ya tienes una cuenta? Entonces, por favor, <a class="link" href="{{ login_url }}">inicia sesión</a>.</p>
+
     {% if not SOCIALACCOUNT_ONLY %}
-        {% url 'account_signup' as action_url %}
-        {% element form form=form method="post" action=action_url tags="entrance,signup" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form unlabeled=True %}
-                {% endelement %}
-                {{ redirect_field }}
-            {% endslot %}
-            {% slot actions %}
-                {% element button tags="prominent,signup" type="submit" %}
-                    {% trans "Sign Up" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
+    <form class="account-form" action="{% url 'account_signup' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <strong>Correo electrónico:</strong> {{ form.email }} {{ form.email.errors }}
+        </div>
+        <div class="form-group">
+            <strong>Nombre de usuario:</strong> {{ form.username }} {{ form.username.errors }}
+        </div>
+        <div class="form-group" >
+            <strong>Contraseña:</strong> {{ form.password1 }} {{ form.password1.errors }}
+        </div>
+        <div class="form-group">
+            <strong>Confirmar contraseña:</strong> {{ form.password2 }} {{ form.password2.errors }}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="boton-principal">Registrarse</button>
+        </div>
+    </form>
     {% endif %}
-    {% if PASSKEY_SIGNUP_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
-            {% trans "Sign up using a passkey" %}
-        {% endelement %}
-    {% endif %}
+
     {% if SOCIALACCOUNT_ENABLED %}
+    <div class="social-login">
+        <h3 class="social-title">inicia sesión con:</h3>
         {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    </div>
     {% endif %}
+</div>
+
+{% include 'footer.html' %}
+
 {% endblock content %}

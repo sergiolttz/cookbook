@@ -1,48 +1,62 @@
 {% extends '__base.html' %}
 
 {% block content %}
-<h1>Perfil de {{ user_profile.user.username }}</h1>
 
-{% if user_profile.profile_picture %}
-<img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil" style="max-width: 200px;">
-{% else %}
-<p>No hay foto de perfil.</p>
-{% endif %}
-
-<p><strong>Nombre:</strong> {{ user_profile.first_name|default:"No especificado" }}</p>
-<p><strong>Apellido:</strong> {{ user_profile.last_name|default:"No especificado" }}</p>
-<p><strong>País:</strong> {{ user_profile.country|default:"No especificado" }}</p>
-<p><strong>Se unió el:</strong> {{ user_profile.user.date_joined|date:"d/m/Y" }}</p>
-<p><strong>Recetas subidas:</strong> {{ created_recipes|length }}</p>
-
-{% if user_profile.user == user %}
-<a href="{% url 'edit_profile' %}">Editar Perfil</a>
-{% endif %}
-
-<h2>Recetas Creadas</h2>
-<div class="recipe-grid">
-    {% if user_profile.user == user %}
-    <a href="{% url 'recipe-create' %}">Crear Receta</a>
-    {% endif %}
-    {% for recipe in created_recipes %}
-    <div class="recipe-item">
-        {% if recipe.image %}
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+<div class="profile-detail-container">
+    <div class="profile-detail-header">
+        {% if user_profile.profile_picture %}
+        <img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil">
+        {% else %}
+        <p>No hay foto de perfil.</p>
         {% endif %}
-        <a href="{% url 'recipe-detail' pk=recipe.pk %}">{{ recipe.title }}</a>
+        <div class="profile-details-section">
+            <h1>{{ user_profile.user.username }}</h1>
+            <p>{{ user_profile.first_name|default:"" }} {{ user_profile.last_name|default:"" }}</p>
+            <p>País: {{ user_profile.country|default:"No especificado" }}</p>
+            <p>Se unió el: {{ user_profile.user.date_joined|date:"d/m/Y" }}</p>
+            <p>Recetas subidas: {{ created_recipes|length }}</p>
+            {% if user_profile.user == user %}
+                <a class="button" href="{% url 'edit_profile' %}">Editar Perfil</a>
+            {% endif %}
+        </div>
     </div>
-    {% endfor %}
 </div>
 
-<h2>Recetas Favoritas</h2>
-<div class="recipe-grid">
-    {% for recipe in favorite_recipes %}
-    <div class="recipe-item">
-        {% if recipe.image %}
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+
+<div class="recipes-section">
+    <h2>Recetas creadas {% if user_profile.user != user %} por {{ user_profile.user.username }} {% endif %}</h2>
+    <div class="recipe-list">
+        {% for item in created_recipes %}
+            {% include 'recipe-card.html' %}
+        {% empty %}
+            {% if user_profile.user == user %}
+            <p>No hay recetas creadas</p>
+            {% else %}
+            <p>{{ user_profile.user.username }} no ha creado ninguna receta</p>
+            {% endif %}
+        {% endfor %}
+    </div>    
+    <div class="button-container">
+        {% if user_profile.user == user %}
+        <a class="button create-recipe-btn" href="{% url 'recipe-create' %}">Crear Receta</a>
         {% endif %}
-        <a href="{% url 'recipe-detail' pk=recipe.pk %}">{{ recipe.title }}</a>
     </div>
-    {% endfor %}
 </div>
+
+
+<div class="recipes-section">
+    <h2>Recetas favoritas {% if user_profile.user != user %} de {{ user_profile.user.username }} {% endif %}</h2>
+    <div class="recipe-list">
+        {% for item in favorite_recipes %}
+        {% include 'recipe-card.html' %}
+        {% empty %}
+        {% if user_profile.user == user %}
+        <p>No hay recetas marcadas como favorita</p>
+        {% else %}
+        <p>{{ user_profile.user.username }} no ha marcado ninguna receta como favorita</p>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% include 'footer.html' %}
 {% endblock %}

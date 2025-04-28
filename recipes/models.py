@@ -51,14 +51,15 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     MEASUREMENT_CHOICES = [
-            ('gr', 'Gramos'),
-            ('kg', 'Kilogramos'),
+            ('gr', 'Gramo(s)'),
+            ('kg', 'Kilogramo(s)'),
             ('ml', 'Mililitros'),
-            ('l', 'Litros'),
-            ('tz', 'Taza'),
-            ('cdta', 'Cucharadita'),
-            ('cda', 'Cucharada'),
-            ('u', 'Unidad'),
+            ('l', 'Litro(s)'),
+            ('tz', 'Taza(s)'),
+            ('cdta', 'Cucharadita(s)'),
+            ('cda', 'Cucharada(s)'),
+            ('u', 'Unidad(es)'),
+            ('pizca', 'Pizca(s)'),
         ]
     measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES)
 

@@ -29,11 +29,11 @@
                 {% endfor %}
             </div>
 
-            <button type="submit">Filtrar</button>
+            <button type="submit" class="filter-button">Filtrar</button>
         </form>
     </div>
 
-    <div style="flex: 1;">
+    <div>
 
         <div class="recipes-section">
             <form method="get">
@@ -73,7 +73,7 @@
         </div>
 
 
-        <section class="recipes-section">
+        <div class="recipes-section">
             <h1>Lista de Recetas {% if current_tag %}con la etiqueta "{{ current_tag.name }}"{% endif %}</h1>
 
             <div class="recipe-list">
@@ -105,7 +105,7 @@
                     {% endif %}
                 </span>
             </div>
-        </section>
+        </div>
     </div>
 </div>
 

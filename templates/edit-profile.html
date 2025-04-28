@@ -1,14 +1,95 @@
 {% extends '__base.html' %}
 
 {% block content %}
-<h1>Editar Perfil</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar Cambios</button>
-</form>
-<form method="post" action="{% url 'deactivate_account' %}">
-    {% csrf_token %}
-    <button type="submit">Desactivar Cuenta</button>
-</form>
+<div class="edit-profile-container">
+    <h1>Editar perfil</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <h2>Foto de perfil:</h2>
+            {{ profile_form.profile_picture }}
+            {{ profile_form.profile_picture.errors }}
+        </div>
+
+        <div class="form-group">
+            <h2>País:</h2>
+            {{ profile_form.country }}
+            {{ profile_form.country.errors }}
+        </div>
+
+        <div class="form-group">
+            <h2>Nombre:</h2>
+            {{ profile_form.first_name }}
+            {{ profile_form.first_name.errors }}
+        </div>
+
+        <div class="form-group">
+            <h2>Apellido:</h2>
+            {{ profile_form.last_name }}
+            {{ profile_form.last_name.errors }}
+        </div>
+
+        <div class="form-group">
+            <h2>Correo electrónico:</h2>
+            {{ profile_form.email }}
+            {{ profile_form.email.errors }}
+        </div>
+
+        {% for field in profile_form %}
+        {% if field.name != 'profile_picture' and field.name != 'country' and field.name != 'first_name' and field.name != 'last_name' and field.name != 'email' %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <button type="submit" name="save_profile">Guardar Cambios del Perfil</button>
+    </form>
+    <hr>
+    <h2>Cambiar Contraseña</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <button type="submit" name="change_password">Cambiar Contraseña</button>
+    </form>
+    <hr>
+    <div class="desactivar-cuenta">
+        <h2>Desactivar cuenta</h2>
+        <p>Esta acción es irreversible. Tu cuenta será desactivada y tus recetas creadas desaparecerán. Por favor, ten
+            cuidado.</p>
+        <button id="desactivarCuentaBtn">Desactivar Cuenta</button>
+        <div id="confirmarDesactivacion">
+            <form method="post" action="{% url 'deactivate_account' %}">
+                {% csrf_token %}
+                <label for="password_confirm_deactivate">Ingresa tu contraseña para confirmar la
+                    desactivación:</label>
+                <input type="password" id="password_confirm_deactivate" name="password_confirm_deactivate" required>
+                <button type="submit">Confirmar Desactivación</button>
+                <button type="button" id="cancelarDesactivacion">Cancelar</button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    <a href="{% url 'user_profile' request.user.username %}" class="volver-perfil-btn">Volver al Perfil</a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const desactivarBtn = document.getElementById('desactivarCuentaBtn');
+        const confirmarDiv = document.getElementById('confirmarDesactivacion');
+        const cancelarBtn = document.getElementById('cancelarDesactivacion');
+
+        desactivarBtn.addEventListener('click', function () {
+            confirmarDiv.style.display = 'block';
+            desactivarBtn.style.display = 'none';
+        });
+
+        cancelarBtn.addEventListener('click', function () {
+            confirmarDiv.style.display = 'none';
+            desactivarBtn.style.display = 'block';
+        });
+    });
+</script>
 {% endblock %}

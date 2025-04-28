@@ -60,13 +60,26 @@
                 <button class="button" type="submit">Calificar</button>
             </form>
             {% else %}
-            <p>Inicia sesión para calificar esta receta.</p>
+                
+            <p><a href="{% url 'account_login' %}">Inicia sesión</a> o <a href="{% url 'account_signup' %}">registrate</a> para calificar esta receta.</p>
             {% endif %}
             {% if average_rating %}
             <p>Calificación Promedio: {{ average_rating|floatformat:1 }}</p>
             {% else %}
             <p>Esta receta aún no ha sido calificada.</p>
             {% endif %}
+        </div>
+        
+        <div class="recipe-details-section">
+            <h3>Ingredientes:</h3>
+            <ul>
+                {% for recipe_ingredient in recipe.recipeingredient_set.all %}
+                <li>
+                    {{ recipe_ingredient.ingredient.name }} - {{ recipe_ingredient.quantity }}
+                    {% if recipe_ingredient.measurement %} {{ recipe_ingredient.measurement }} {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
         </div>
 
         <div class="recipe-details-section">
@@ -88,6 +101,8 @@
     </div>
 </div>
 
+{% include 'footer.html' %}
+
 <script>
     document.getElementById('copy-link').addEventListener('click', function () {
         var recipeLink = document.getElementById('recipe-link');
@@ -97,4 +112,5 @@
         alert('Copiado al portapapeles');
     });
 </script>
+
 {% endblock content %}
