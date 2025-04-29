@@ -1,0 +1,247 @@
+@media (max-width: 1024px) {
+
+    .header,
+    .footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .header .search-form {
+        width: 90%;
+        flex-direction: column;
+    }
+
+    .header .search-form input[type="text"],
+    .header .search-form button.search-button {
+        width: 100%;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .profile-info {
+        flex-direction: column;
+        margin-top: 10px;
+    }
+
+    .recipe-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .recipe-card {
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 20px auto;
+        box-sizing: border-box;
+    }
+
+    .recipe-detail-header,
+    .recipe-main-content {
+        flex-direction: column;
+    }
+
+    .recipe-rating-section {
+        width: 100%;
+    }
+
+    .recipe-details-section {
+        padding: 0;
+    }
+
+    .form-group,
+    .form-actions {
+        width: 100%;
+    }
+
+    .create-recipe-container #add-ingredient,
+    .create-recipe-container #add-step,
+    .create-recipe-container button[type="submit"],
+    .create-recipe-container a button[type="button"] {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .account-container,
+    .signup-container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .filter-controls-container,
+    .filter-controls {
+        flex-direction: column;
+    }
+
+    .filter-controls .filter-group {
+        width: 100%;
+    }
+
+    .recipe-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .recipe-links input[type="text"]#recipe-link {
+        width: 100%;
+    }
+
+    .pagination {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+
+    .header .logo {
+        display: flex;
+        align-items: center;
+    }
+    .logo-mobile {
+        display: block;
+    }
+
+    .logo-desktop {
+        display: none;
+    }
+
+    .home-logo img {
+        height: 170px;
+        width: auto;
+    }
+
+    .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header-btn {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+        margin-left: 5px;
+    }
+
+    .profile-icon img,
+    .profile-icon-dropdown img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .profile-info p {
+        margin: 0;
+    }
+    
+
+    .recipe-page-container {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .filter-section {
+        width: 100%;
+    }
+
+    .recipes-section-list {
+        width: 100%;
+        max-width: 600px;
+        margin: 10px;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+
+    .recipes-section {
+        width: 95%;
+        max-width: 600px;
+        margin: 10px;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+
+    .search-and-filters {
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 20px auto;
+        box-sizing: border-box;
+    }
+
+    .filter-controls-container {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+
+    .search-form {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search-form input[type="text"],
+    .search-form button.search-button {
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .search-form input[type="text"] {
+        margin-top: 20px;
+    }
+
+    .filter-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-controls .filter-group {
+        width: 100%;
+    }
+
+    .button-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .filter-toggle-button {
+        margin-top: 30px;
+    }
+
+    .recipe-card {
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 20px auto;
+        box-sizing: border-box;
+    }
+
+    .recipe-list {
+        margin-top: 20px;
+    }
+
+    .view-more-btn {
+        margin-bottom: 20px;
+        align-self: auto;
+    }
+
+    .search-container {
+        margin: 10px;
+    }
+    .recipe-actions {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 769px) {
+    .filter-toggle-button {
+        display: none;
+    }
+}

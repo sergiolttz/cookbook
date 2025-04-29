@@ -5,13 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/recipes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <link rel="apple-touch-icon" sizes="any" href="{% static 'apple-touch-icon.png' %}">
+
     <title>TasteBook</title>
 </head>
 
@@ -19,11 +27,12 @@
     <header class="header">
         {% if request.path != '/recipes/' %}
             <div class="logo">
-                <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook"></a>
+                <a href="{% url 'home' %}"> <img src="{% static 'images/logo.png' %}" alt="TasteBook" class="logo-mobile"> </a>
+                <a href="{% url 'home' %}"> <img src="{% static 'images/icon.png' %}" alt="TasteBook" class="logo-desktop"> </a>
             </div>
         {% endif %}
     
-        {% if request.path != '/recipes/' and request.path != '/recipes/list/' %}
+        {% if "/accounts/" not in request.path and request.path != '/recipes/' and request.path != '/recipes/list/' %}
             <div class="header-search-bar">
                 <form class="search-form" method="get" action="{% url 'recipes-list' %}">
                     <input type="text" name="q" placeholder="Buscar recetas...">
@@ -31,6 +40,7 @@
                 </form>
             </div>
         {% endif %}
+
     
         <div class="profile-info">
             {% if user.is_authenticated and logged_in_user_profile %}
@@ -50,9 +60,12 @@
                 </div>
             </div>
             {% else %}
-                <p> <a class="button header-btn" href="{% url 'account_login' %}">Iniciar Sesión</a>
+                {% if "/accounts/" not in request.path %}
+                <p>
+                    <a class="button header-btn" href="{% url 'account_login' %}">Iniciar Sesión</a>
                     <a class="button header-btn" href="{% url 'account_signup' %}">Registrarse</a>
                 </p>
+                {% endif %}
             {% endif %}
         </div>
         {% if messages %}

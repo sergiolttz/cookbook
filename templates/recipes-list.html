@@ -1,6 +1,8 @@
 {% extends '__base.html' %}
 {% block content %}
-<div style="display: flex;">
+<div class="recipe-page-container">
+    <button id="toggle-filters" class="filter-toggle-button">Mostrar/Ocultar Filtros</button>
+
     <div class="filter-section">
         <h2>Filtrar por Etiquetas</h2>
         <form method="get">
@@ -16,15 +18,17 @@
 
             <div id="tag-selection-container">
                 {% for tag_type in tag_types %}
-                <div class="tag-type-section">
-                    <h3>{{ tag_type }}</h3>
-                    {% for tag in all_tags %}
-                    {% if tag.tag_type == tag_type %}
-                    <label>
-                        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in selected_tags %} checked {% endif %}> {{ tag.name }}
-                    </label><br>
-                    {% endif %}
-                    {% endfor %}
+                <div class="tag-type-section collapsible-section">
+                    <h3 class="collapsible-header">{{ tag_type }}</h3>
+                    <div class="collapsible-content">
+                        {% for tag in all_tags %}
+                        {% if tag.tag_type == tag_type %}
+                        <label>
+                            <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in selected_tags %} checked {% endif %}> {{ tag.name }}
+                        </label><br>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -34,46 +38,45 @@
     </div>
 
     <div>
-
-        <div class="recipes-section">
-            <form method="get">
-                <div class="search-form">
-                    <input type="text" name="q" placeholder="Buscar recetas..."
-                        value="{% if query %}{{ query }}{% endif %}">
-                    <button type="submit" class="search-button">Buscar</button>
-                </div>
-
-
-                <div class="filter-controls-container">
-                    <div class="filter-controls">
-                        <div class="filter-group">
-                            <label for="sort">Ordenar por:</label>
-                            <select name="sort" id="sort">
-                                <option value="">Ninguno</option>
-                                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
-                                <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración
-                                </option>
-                                <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>
-                                    Ingredientes</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="order">Orden:</label>
-                            <select name="order" id="order">
-                                <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
-                                <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
-                            </select>
-                        </div>
+        <div class="recipes-section-list">
+            <div class="search-and-filters">
+                <form method="get">
+                    <div class="search-form">
+                        <input type="text" name="q" placeholder="Buscar recetas..."
+                            value="{% if query %}{{ query }}{% endif %}">
+                        <button type="submit" class="search-button">Buscar</button>
                     </div>
 
-                    <button type="submit" class="filter-button">Filtrar/Ordenar</button>
-                </div>
-            </form>
+                    <div class="filter-controls-container">
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="sort">Ordenar por:</label>
+                                <select name="sort" id="sort">
+                                    <option value="">Ninguno</option>
+                                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
+                                    <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Duración
+                                    </option>
+                                    <option value="ingredients" {% if sort_by == 'ingredients' %}selected{% endif %}>
+                                        Ingredientes</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="order">Orden:</label>
+                                <select name="order" id="order">
+                                    <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascendente</option>
+                                    <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descendente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="filter-button">Filtrar/Ordenar</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-
-        <div class="recipes-section">
+        <div class="recipes-section-list">
             <h1>Lista de Recetas {% if current_tag %}con la etiqueta "{{ current_tag.name }}"{% endif %}</h1>
 
             <div class="recipe-list">
@@ -88,15 +91,15 @@
                 <span class="step-links">
                     {% if recipes_page.has_previous %}
                     <a class="button pagination-button" style="background-color: var(--primario);"
-                        href="?page=1{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}"> Primera</a>
+                        href="?page=1{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}">Primera</a>
                     <a class="button pagination-button" style="background-color: var(--primario);"
                         href="?page={{ recipes_page.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}">Anterior</a>
                     {% endif %}
-            
+
                     <span class="current">
                         Página {{ recipes_page.number }} de {{ recipes_page.paginator.num_pages }}.
                     </span>
-            
+
                     {% if recipes_page.has_next %}
                     <a class="button pagination-button" style="background-color: var(--primario);"
                         href="?page={{ recipes_page.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% for tag_id in selected_tags %}&tags={{ tag_id }}{% endfor %}">Siguiente</a>
@@ -110,5 +113,30 @@
 </div>
 
 {% include 'footer.html' %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleButton = document.getElementById('toggle-filters');
+        const filterSection = document.querySelector('.filter-section');
+
+        if (toggleButton && filterSection) {
+            toggleButton.addEventListener('click', () => {
+                filterSection.classList.toggle('collapsed');
+            });
+
+            // Ocultar por defecto solo en móviles
+            if (window.innerWidth <= 768) {
+                filterSection.classList.add('collapsed');
+            }
+        }
+
+        // Colapsar o expandir cada tipo de filtro
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.nextElementSibling.classList.toggle('collapsed');
+            });
+        });
+    });
+</script>
 
 {% endblock %}
