@@ -1,90 +1,139 @@
 {% extends '__base.html' %}
 {% block content %}
-<h2>Editar Receta: {{ recipe.title }}</h2>
-<a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
+<div class="create-recipe-container">
+    <h1>Editar Receta: {{ recipe.title }}</h1>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    {{ form.as_p }}
+        <div class="form-group">
+            {{ form.title.errors }}
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+        </div>
 
-    <h2>Etiquetas</h2>
-    <div>
-        {% for tag_type in tag_types %}
-        <button type="button" class="tag-type-button" data-tag-type="{{ tag_type }}">{{ tag_type }}</button>
-        {% endfor %}
-    </div>
+        <div class="form-group">
+            {{ form.description.errors }}
+            <label for="{{ form.description.id_for_label }}">Descripción:</label>
+            {{ form.description }}
+        </div>
 
-    <div id="tag-selection-container">
-        {% for tag_type in tag_types %}
-        <div class="tag-type-section" id="tag-section-{{ tag_type }}" style="display: none;">
-            <h3>{{ tag_type }}</h3>
-            {% for tag in all_tags %}
-            {% if tag.tag_type == tag_type %}
-            <label>
-                <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag in recipe.tags.all %}checked{% endif %}> {{ tag.name }}
-            </label><br>
-            {% endif %}
+        <div class="form-group file-upload-wrapper">
+            <label for="upload-button" class="upload-button">Seleccionar Archivo</label>
+            {{ form.image }}
+            <span id="file-name"></span>
+            {{ form.image.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.time_required.errors }}
+            <label for="{{ form.time_required.id_for_label }}">Tiempo requerido:</label>
+            {{ form.time_required }}
+        </div>
+
+        <div class="form-group">
+            {{ form.servings.errors }}
+            <label for="{{ form.servings.id_for_label }}">Porciones:</label>
+            {{ form.servings }}
+        </div>
+
+        <h2>Etiquetas</h2>
+        <div>
+            {% for tag_type in tag_types %}
+            <button type="button" class="tag-type-button" data-tag-type="{{ tag_type }}">{{ tag_type }}</button>
             {% endfor %}
         </div>
-        {% endfor %}
-    </div>
 
-    <h3>Agregar Ingrediente</h3>
-    <div id="ingredients-container">
-        {% for ingredient in recipe.recipeingredient_set.all %}
-        <div class="ingredient-row">
-            <label for="ingredient_name">Nombre Ingrediente</label>
-            <input type="text" name="ingredient_name" value="{{ ingredient.ingredient.name }}">
-            <label for="ingredient_quantity">Cantidad</label>
-            <input type="text" name="ingredient_quantity" value="{{ ingredient.quantity }}">
-            <label for="ingredient_measurement">Medida</label>
-            <select name="ingredient_measurement">
-                {% for option, display in ingredient.MEASUREMENT_CHOICES %}
-                <option value="{{ option }}" {% if option == ingredient.measurement %}selected{% endif %}>{{ display }}
-                </option>
+        <div id="tag-selection-container">
+            {% for tag_type in tag_types %}
+            <div class="tag-type-section" id="tag-section-{{ tag_type }}" style="display: none;">
+                <h3>{{ tag_type }}</h3>
+                {% for tag in all_tags %}
+                {% if tag.tag_type == tag_type %}
+                <label>
+                    <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag in recipe.tags.all %}checked{% endif %}> {{ tag.name }}
+                </label><br>
+                {% endif %}
                 {% endfor %}
-            </select>
-            <button type="button" class="remove-ingredient">Eliminar</button>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-        <div class="ingredient-row">
-            <label for="ingredient_name">Nombre Ingrediente</label>
-            <input type="text" name="ingredient_name">
-            <label for="ingredient_quantity">Cantidad</label>
-            <input type="text" name="ingredient_quantity">
-            <label for="ingredient_measurement">Medida</label>
-            <select name="ingredient_measurement">
-                {% for option, display in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
-                <option value="{{ option }}">{{ display }}</option>
-                {% endfor %}
-            </select>
-            <button type="button" class="remove-ingredient">Eliminar</button>
-        </div>
-    </div>
-    <button type="button" id="add-ingredient">Agregar Ingrediente</button>
 
-    <h3>Pasos a Seguir</h3>
-    <div id="steps-container">
-        {% for step in recipe.steps.all %}
-        <div class="step-row">
-            <label for="step_description">Paso {{ step.step_number }}:</label>
-            <textarea name="step_description">{{ step.description }}</textarea>
-            <button type="button" class="remove-step">Eliminar</button>
-        </div>
-        {% endfor %}
-        <div class="step-row">
-            <label for="step_description">Paso {{ recipe.steps.count|add:1 }}:</label>
-            <textarea name="step_description"></textarea>
-            <button type="button" class="remove-step">Eliminar</button>
-        </div>
-    </div>
-    <button type="button" id="add-step">Agregar Paso</button>
+        <h2>Ingredientes</h2>
+        <div id="ingredients-container">
+            {% for ingredient in recipe.recipeingredient_set.all %}
+            <div class="ingredient-form">
+                <div class="form-group">
+                    <label>Nombre Ingrediente</label>
+                    <input type="text" name="ingredient_name" value="{{ ingredient.ingredient.name }}">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="text" name="ingredient_quantity" value="{{ ingredient.quantity }}">
+                </div>
+                <div class="form-group">
+                    <label>Medida</label>
+                    <select name="ingredient_measurement">
+                        {% for option, display in ingredient.MEASUREMENT_CHOICES %}
+                        <option value="{{ option }}" {% if option == ingredient.measurement %}selected{% endif %}>{{ display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="remove-ingredient">Eliminar Ingrediente</button>
+            </div>
+            {% endfor %}
 
-    <button type="submit">Guardar Cambios</button>
-</form>
-<a href="{% url 'recipe-delete' pk=recipe.pk %}">Eliminar Receta</a>
-<a href="{% url 'recipe-detail' pk=recipe.pk %}">Volver a la receta</a>
+            <div class="ingredient-form">
+                <div class="form-group">
+                    <label>Nombre Ingrediente</label>
+                    <input type="text" name="ingredient_name">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="text" name="ingredient_quantity">
+                </div>
+                <div class="form-group">
+                    <label>Medida</label>
+                    <select name="ingredient_measurement">
+                        {% for option, display in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
+                        <option value="{{ option }}">{{ display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="remove-ingredient">Eliminar Ingrediente</button>
+            </div>
+        </div>
+        <button type="button" id="add-ingredient">Agregar Ingrediente</button>
+
+        <h2>Pasos</h2>
+        <div id="steps-container">
+            {% for step in recipe.steps.all %}
+            <div class="step-form">
+                <div class="form-group">
+                    <label for="step_description">Paso {{ step.step_number }}:</label>
+                    <textarea name="step_description">{{ step.description }}</textarea>
+                </div>
+                <button type="button" class="remove-step">Eliminar Paso</button>
+            </div>
+            {% endfor %}
+            <div class="step-form">
+                <div class="form-group">
+                    <label for="step_description">Paso {{ recipe.steps.count|add:1 }}:</label>
+                    <textarea name="step_description"></textarea>
+                </div>
+                <button type="button" class="remove-step">Eliminar Paso</button>
+            </div>
+        </div>
+        <button type="button" id="add-step">Agregar Paso</button>
+
+        <div class="form-actions">
+            <button type="submit">Guardar Cambios</button>
+            <a href="{% url 'recipe-detail' pk=recipe.pk %}"><button type="button">Cancelar</button></a>
+        </div>
+    </form>
+</div>
+
+{% include 'footer.html' %}
 
 <script>
     document.querySelectorAll('.tag-type-button').forEach(button => {
@@ -94,67 +143,90 @@
             tagSection.style.display = tagSection.style.display === 'none' ? 'block' : 'none';
         });
     });
+
     document.addEventListener('DOMContentLoaded', function () {
-        // Ingredientes
         const ingredientsContainer = document.getElementById('ingredients-container');
         const addIngredientButton = document.getElementById('add-ingredient');
 
         addIngredientButton.addEventListener('click', function () {
             const timestamp = new Date().getTime();
             const newRow = document.createElement('div');
-            newRow.classList.add('ingredient-row');
+            newRow.classList.add('ingredient-form');
             newRow.innerHTML = `
-                <label for="ingredient_name">Nombre Ingrediente</label>
-                <input type="text" name="ingredient_name" id="ingredient_name_${timestamp}">
-                <label for="ingredient_quantity">Cantidad</label>
-                <input type="text" name="ingredient_quantity" id="ingredient_quantity_${timestamp}" oninput="this.value = this.value.replace(/[^0-9./]/g, '').replace(/(\..*)\./g, '$1');">
-                <label for="ingredient_measurement">Medida</label>
-                <select name="ingredient_measurement" id="ingredient_measurement_${timestamp}">
-                    {% for choice in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
-                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" class="remove-ingredient">Eliminar</button>
+                <div class="form-group">
+                    <label>Nombre Ingrediente</label>
+                    <input type="text" name="ingredient_name">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="text" name="ingredient_quantity">
+                </div>
+                <div class="form-group">
+                    <label>Medida</label>
+                    <select name="ingredient_measurement">
+                        {% for option, display in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
+                        <option value="{{ option }}">{{ display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="remove-ingredient">Eliminar Ingrediente</button>
             `;
             ingredientsContainer.appendChild(newRow);
-
-            newRow.querySelector('.remove-ingredient').addEventListener('click', function () {
-                newRow.remove();
-            });
         });
 
-        ingredientsContainer.querySelectorAll('.remove-ingredient').forEach(button => {
-            button.addEventListener('click', function () {
-                this.parentElement.remove();
-            });
+        ingredientsContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-ingredient')) {
+                e.target.closest('.ingredient-form').remove();
+            }
         });
 
-        // Pasos
         const stepsContainer = document.getElementById('steps-container');
         const addStepButton = document.getElementById('add-step');
-        let stepCount = parseInt("{{ recipe.steps.count|add:1 }}", 10);
+        let stepCount = parseInt("{{ recipe.steps.count|add:1 }}");
 
         addStepButton.addEventListener('click', function () {
-            const timestamp = new Date().getTime();
             const newRow = document.createElement('div');
-            newRow.classList.add('step-row');
+            newRow.classList.add('step-form');
             newRow.innerHTML = `
-                <label for="step_description">Paso ${stepCount}:</label>
-                <textarea name="step_description" id="step_description_${timestamp}"></textarea>
-                <button type="button" class="remove-step">Eliminar</button>
+                <div class="form-group">
+                    <label for="step_description">Paso ${stepCount}:</label>
+                    <textarea name="step_description"></textarea>
+                </div>
+                <button type="button" class="remove-step">Eliminar Paso</button>
             `;
             stepsContainer.appendChild(newRow);
-
-            newRow.querySelector('.remove-step').addEventListener('click', function () {
-                newRow.remove();
-            });
             stepCount++;
         });
 
-        stepsContainer.querySelectorAll('.remove-step').forEach(button => {
-            button.addEventListener('click', function () {
-                this.parentElement.remove();
-            });
+        stepsContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-step')) {
+                e.target.closest('.step-form').remove();
+            }
+        });
+
+        const imageInput = document.querySelector('input[type="file"][name="image"]');
+        const imagePreviewContainer = document.createElement('div');
+        imagePreviewContainer.style.marginTop = '10px';
+        const imagePreview = document.createElement('img');
+        imagePreview.style.maxWidth = '200px';
+        imagePreview.style.maxHeight = '200px';
+        imagePreview.style.display = 'none';
+        imagePreviewContainer.appendChild(imagePreview);
+        imageInput.parentNode.insertBefore(imagePreviewContainer, imageInput.nextSibling);
+
+        imageInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+            }
         });
     });
 </script>

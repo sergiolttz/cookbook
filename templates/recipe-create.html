@@ -132,7 +132,6 @@
     `;
 
     const ingredientEmptyFormHtml = `
-        <div class="ingredient-form">
             <div class="form-group">
                 <label for="id_ingredients-__prefix__-ingredient_name">Nombre del ingrediente:</label>
                 <input type="text" name="ingredients-__prefix__-ingredient_name" maxlength="100" id="id_ingredients-__prefix__-ingredient_name">
@@ -147,18 +146,17 @@
                     ${measurementChoicesHtml}
                 </select>
             </div>
-        </div>
     `;
 
     addIngredientButton.addEventListener('click', function () {
-        const newFormWrapper = document.createElement('div'); // Crear el div envolvente
-        newFormWrapper.classList.add('ingredient-form'); // Añadir la clase para los estilos
+        const newFormWrapper = document.createElement('div');
+        newFormWrapper.classList.add('ingredient-form');
         newFormWrapper.innerHTML = ingredientEmptyFormHtml.replace(/__prefix__/g, ingredientFormCount);
         ingredientFormsetContainer.appendChild(newFormWrapper);
         ingredientFormCount++;
         document.getElementById('id_ingredients-TOTAL_FORMS').value = ingredientFormCount;
 
-        // Agregar el botón de eliminar al nuevo formulario (ahora dentro del wrapper)
+        // Agregar el botón de eliminar al nuevo formulario
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
         removeButton.textContent = 'Eliminar Ingrediente';
@@ -172,12 +170,10 @@
     const stepFormsetPrefix = '{{ step_formset.prefix }}';
     let stepFormCount = parseInt('{{ step_formset.total_form_count }}');
     const stepEmptyFormHtml = `
-        <div class="step-form">
             <div class="form-group">
                 <label for="id_steps-__prefix__-step_description">Descripción del paso:</label>
                 <textarea name="steps-__prefix__-step_description" cols="30" rows="3" id="id_steps-__prefix__-step_description"></textarea>
             </div>
-        </div>
     `;
 
     addStepButton.addEventListener('click', function () {

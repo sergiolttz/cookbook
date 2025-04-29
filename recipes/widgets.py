@@ -11,11 +11,18 @@ class RecipeDurationWidget(forms.MultiWidget):
         super().__init__(widgets, attrs)
 
     def decompress(self, value):
-        print(f"Valor recibido en decompress(): {value}")  # Agregar print() statement
         if isinstance(value, timedelta):
-            hours, remainder = divmod(value.total_seconds(), 3600)
+            total_seconds = int(value.total_seconds())
+            hours, remainder = divmod(total_seconds, 3600)
             minutes = remainder // 60
-            return [int(hours), int(minutes)]
+            return [hours, minutes]
+        elif isinstance(value, str):
+            # Manejo de strings tipo 'HH:MM:SS'
+            try:
+                h, m, *_ = map(int, value.split(':'))
+                return [h, m]
+            except:
+                return [None, None]
         return [None, None]
 
     def value_from_datadict(self, data, files, name):
