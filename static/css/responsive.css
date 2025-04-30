@@ -2,7 +2,6 @@
 
     .header,
     .footer {
-        flex-direction: column;
         align-items: center;
         text-align: center;
     }
@@ -31,7 +30,6 @@
 
     .recipe-card {
         width: 100%;
-        max-width: 340px;
         margin: 0 auto 20px auto;
         box-sizing: border-box;
     }
@@ -105,6 +103,7 @@
         display: flex;
         align-items: center;
     }
+
     .logo-mobile {
         display: block;
     }
@@ -141,7 +140,7 @@
     .profile-info p {
         margin: 0;
     }
-    
+
 
     .recipe-page-container {
         flex-direction: column;
@@ -235,6 +234,7 @@
     .search-container {
         margin: 10px;
     }
+
     .recipe-actions {
         flex-direction: column;
     }
@@ -243,5 +243,130 @@
 @media (min-width: 769px) {
     .filter-toggle-button {
         display: none;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1366px) {
+
+    .recipe-detail-header,
+    .recipe-main-content,
+    .profile-detail-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .recipe-detail-header img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    .recipe-details-section {
+        width: 100%;
+        padding: 0 20px;
+    }
+
+    .recipe-list {
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .recipe-card {
+        width: 45%;
+        max-width: 400px;
+        flex: 1 1 calc(50% - 20px);
+    }
+
+    .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        flex-wrap: wrap;
+    }
+
+    .header .search-form {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        margin: 10px 0;
+    }
+
+    .header .search-form input[type="text"] {
+        flex-grow: 1;
+        width: auto;
+        margin-right: 10px;
+    }
+
+    .header .search-form button.search-button {
+        width: auto;
+    }
+
+    .header .profile-info {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+
+    .profile-info {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .search-container,
+    .search-wrapper {
+        width: 90%;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 30px;
+        flex-wrap: wrap;
+    }
+
+    .header .header-search-bar {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    .header .search-form {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        margin: 0;
+    }
+
+    .header .search-form input[type="text"] {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .header .search-form button.search-button {
+        flex-shrink: 0;
+        width: auto;
+    }
+
+    .header .profile-info {
+        margin-left: 0;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .profile-info p {
+        margin-right: 10px;
+    }
+
+    .profile-icon {
+        margin-left: 10px;
     }
 }

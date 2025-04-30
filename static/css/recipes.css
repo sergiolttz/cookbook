@@ -46,6 +46,11 @@
     margin-bottom: 10px;
 }
 
+.recipes-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .recipe-card {
     background-color: var(--grisClaro);
     width: 30%;
