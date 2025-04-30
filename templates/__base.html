@@ -46,12 +46,20 @@
             {% if user.is_authenticated and logged_in_user_profile %}
             <div class="profile-dropdown">
                 <div class="profile-icon">
+                    {% if user.profile.profile_picture %}
                     <img src="{{ logged_in_user_profile.profile_picture.url }}" alt="Foto de perfil" id="profile-toggle">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.jpg' %}" alt="Avatar por defecto" id="profile-toggle">
+                    {% endif %}
                 </div>
                 <div class="dropdown-content" id="profile-menu">
                     <div class="dropdown-header">
                         <div class="profile-icon-dropdown">
+                            {% if user.profile.profile_picture %}
                             <img src="{{ logged_in_user_profile.profile_picture.url }}" alt="Foto de perfil">
+                            {% else %}
+                            <img src="{% static 'images/default-avatar.jpg' %}" alt="Avatar por defecto">
+                            {% endif %}
                         </div>
                         <p>Hola <strong>{{ user.username }}</strong></p>
                     </div>

@@ -1,0 +1,110 @@
+:root {
+    --primario: #606c38;    /* Verde principal */
+    --primarioOscuro: #4a532d;    /* Verde principal oscuro (hover de botones, etc.) */
+    --secundario: #bc6c25;    /* Naranja/marrón secundario */
+    --secundarioOscuro: #a45a1b;    /* Naranja/marrón secundario oscuro (hover de botones, etc.) */
+    --terciario: #dda15e;    /* Beige/marrón claro terciario (fondo principal) */
+
+    /* Colores neutros */
+    --blanco: #fffdee;
+    --negro: #283618;
+
+    --grisClaro: #fefae0;    /* Gris muy claro para fondos de secciones */
+    --grisMedio: #cfd0ae;    /* Gris medio para bordes, tags, etc. */
+    --grisOscuro: #333;    /* Gris oscuro para enlaces por defecto */
+}
+
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--terciario);
+}
+
+.a {
+    text-decoration: none;
+    color: var(--grisOscuro);
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.all-recipes-btn {
+    background-color: var(--secundario);
+}
+
+.all-recipes-btn:hover {
+    background-color: var(--secundarioOscuro);
+}
+
+.create-recipe-btn {
+    background-color: var(--primario);
+}
+
+.create-recipe-btn:hover {
+    background-color: var(--primarioOscuro);
+}
+
+.view-more-btn {
+    margin-top: 10px;
+    background-color: var(--secundario);
+    color: var(--blanco);
+    padding: 12px 25px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+.view-more-btn:hover {
+    background-color: var(--secundarioOscuro);
+    }
+    
+.account-container {
+    background-color: var(--blanco);
+    width: 80%;
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: var(--negro);
+}
+.account-title {
+    color: var(--negro);
+    margin-bottom: 20px;
+}
+
+.account-container-link {
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.account-container-link .link {
+    color: var(--secundario);
+    text-decoration: none;
+}
+
+.account-container-link .link:hover {
+    color: var(--secundarioOscuro);
+}
+
+.account-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.logo-mobile {
+    display: none;
+}
+
+.logo-desktop {
+    display: block;
+}
+

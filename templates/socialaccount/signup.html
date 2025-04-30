@@ -1,0 +1,21 @@
+{% extends '__base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="account-container">
+    <h1 class="account-title">Iniciar Sesión con Google o Facebook</h1>
+
+    <p class="account-container-link">
+        Estás a punto de iniciar sesión usando una cuenta de un tercero.
+    </p>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="boton-principal">Continuar</button>
+        </div>
+    </form>
+</div>
+
+{% include 'footer.html' %}
+{% endblock %}

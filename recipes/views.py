@@ -398,6 +398,7 @@ def edit_profile(request):
                 return redirect('edit_profile')
             else:
                 messages.error(request, 'Por favor, corrige los errores en el perfil.')
+
         elif 'change_password' in request.POST:
             password_form = CustomPasswordChangeForm(request.user, request.POST)
             if password_form.is_valid():
@@ -407,6 +408,14 @@ def edit_profile(request):
                 return redirect('edit_profile')
             else:
                 messages.error(request, 'Por favor, corrige los errores en la contraseña.')
+
+        elif 'remove_picture' in request.POST:
+            if user_profile.profile_picture:
+                user_profile.profile_picture.delete(save=False)
+            user_profile.profile_picture = 'profile_pics/default.jpg'
+            user_profile.save()
+            messages.success(request, 'Tu foto de perfil ha sido eliminada y reemplazada por la imagen por defecto.')
+            return redirect('edit_profile')
 
     user_profile_for_context = None
     try:
