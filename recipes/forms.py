@@ -3,6 +3,8 @@ from .models import Recipe, RecipeIngredient, Rating, UserProfile
 from .widgets import RecipeDurationWidget
 import datetime
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.exceptions import ValidationError
+
 
 
 
@@ -25,6 +27,12 @@ class RecipeForm(forms.ModelForm):
             return datetime.timedelta(microseconds=time_required.total_seconds() * 1000000)
         else:
             return None
+        
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image and image.size > 2 * 1024 * 1024:  # 2 MB
+            raise ValidationError("La imagen no puede pesar más de 2 MB.")
+        return image
 
 class IngredientForm(forms.Form):
     ingredient_name = forms.CharField(max_length=100)

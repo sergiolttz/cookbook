@@ -1,5 +1,10 @@
+import os
+from uuid import uuid4
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
+from PIL import Image
+from django.core.files.base import ContentFile
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -17,18 +22,17 @@ class Tag(models.Model):
 class Recipe(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
-    image = models.ImageField(upload_to="images/", default="images/default.jpg")
+    ingredients = models.ManyToManyField('Ingredient', through='RecipeIngredient')
+    image = models.ImageField(upload_to="images/recipes/", default="images/recipes/default.jpg")
     time_required = models.DurationField()
     servings = models.PositiveIntegerField(default=1)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
-    tags = models.ManyToManyField(Tag, blank=True) 
+    tags = models.ManyToManyField('Tag', blank=True)
 
     def __str__(self):
         return self.title
-
 
 class Rating(models.Model):
     RATING_CHOICES = [
@@ -51,21 +55,20 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     MEASUREMENT_CHOICES = [
-            ('gr', 'Gramo(s)'),
-            ('kg', 'Kilogramo(s)'),
-            ('ml', 'Mililitros'),
-            ('l', 'Litro(s)'),
-            ('tz', 'Taza(s)'),
-            ('cdta', 'Cucharadita(s)'),
-            ('cda', 'Cucharada(s)'),
-            ('u', 'Unidad(es)'),
-            ('pizca', 'Pizca(s)'),
-        ]
+        ('gr', 'Gramo(s)'),
+        ('kg', 'Kilogramo(s)'),
+        ('ml', 'Mililitros'),
+        ('l', 'Litro(s)'),
+        ('tz', 'Taza(s)'),
+        ('cdta', 'Cucharadita(s)'),
+        ('cda', 'Cucharada(s)'),
+        ('u', 'Unidad(es)'),
+        ('pizca', 'Pizca(s)'),
+    ]
     measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES)
 
     def __str__(self):
         return f'{self.ingredient.name} en {self.recipe.title}'
-
 
 class Step(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='steps')
@@ -77,10 +80,10 @@ class Step(models.Model):
 
     def __str__(self):
         return f'{self.recipe.title} - Paso {self.step_number}'
-    
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True, default="profile_pics/default.jpg")
+    profile_picture = models.ImageField(upload_to="profile_pics/", blank=True, null=True, default="profile_pics/default.jpg")
     favorite_recipes = models.ManyToManyField('Recipe', related_name='favorited_by', blank=True)
     country = models.CharField(max_length=100, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)

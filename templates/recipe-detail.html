@@ -3,9 +3,14 @@
 {% block content %}
 <div class="recipe-detail-container">
     <h1>{{ recipe.title }}</h1>
-    {% if recipe.image %}
+    
     <div class="recipe-detail-header">
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+        {% if recipe.image %}
+            {% load thumbnail %}
+            {% thumbnail recipe.image "800x600" crop="center" as im %}
+            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="{{ recipe.title }}">
+            {% endthumbnail %}
+        {% endif %}
         <div class="recipe-details-section">
             <p>{{ recipe.description }}</p>
             <div class="tags-container">
@@ -43,7 +48,7 @@
             {% endif %}
         </div>
     </div>
-    {% endif %}
+    
 
     <div class="recipe-main-content">
         <div class="recipe-rating-section">

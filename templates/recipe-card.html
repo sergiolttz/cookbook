@@ -2,7 +2,10 @@
     {% if item.recipe %}
     <a href="{% url 'recipe-detail' pk=item.recipe.pk %}">
         {% if item.recipe.image %}
-        <img src="{{ item.recipe.image.url }}" alt="{{ item.recipe.title }}">
+        {% load thumbnail %}
+        {% thumbnail item.recipe.image "500x400" crop="center" as im %}
+        <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="{{ item.recipe.title }}">
+        {% endthumbnail %}
         {% endif %}
         <h3>{{ item.recipe.title }}</h3>
         <div class="recipe-details">
