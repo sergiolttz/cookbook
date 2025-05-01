@@ -1,18 +1,21 @@
-# Usa una imagen base oficial de Python
+# Imagen base liviana de Python 3.12
 FROM python:3.12-slim
 
-# Establece el directorio de trabajo en el contenedor
+# Establecer el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia los archivos del proyecto al contenedor
-COPY . /app
+# Copiar todo el contenido del proyecto al contenedor
+COPY . .
 
-# Instala dependencias
+# Actualizar pip e instalar dependencias
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Expone el puerto en el que gunicorn correrá
+# Crear directorios para static y media (por si acaso)
+RUN mkdir -p /app/staticfiles /app/media
+
+# Exponer el puerto por el que se servirá la aplicación
 EXPOSE 8000
 
-# Comando de inicio
+# Comando de arranque usando Gunicorn
 CMD ["gunicorn", "django_project.wsgi:application", "--bind", "0.0.0.0:8000"]
