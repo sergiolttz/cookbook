@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: cookbook-django
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn django_project.wsgi
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        value: tu-clave-secreta
+      - key: ALLOWED_HOSTS
+        value: cookbook.onrender.com
