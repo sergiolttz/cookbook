@@ -69,7 +69,7 @@
                 </div>
                 <div class="form-group">
                     <label>Cantidad</label>
-                    <input type="text" name="ingredient_quantity" value="{{ ingredient.quantity }}">
+                    <input type="number" name="ingredient_quantity" value="{{ ingredient.quantity }}" min="0">
                 </div>
                 <div class="form-group">
                     <label>Medida</label>
@@ -90,13 +90,13 @@
                 </div>
                 <div class="form-group">
                     <label>Cantidad</label>
-                    <input type="text" name="ingredient_quantity">
+                    <input type="number" name="ingredient_quantity" min="0">
                 </div>
                 <div class="form-group">
                     <label>Medida</label>
                     <select name="ingredient_measurement">
-                        {% for option, display in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
-                        <option value="{{ option }}">{{ display }}</option>
+                        {% for option, display in measurement_choices %}
+                            <option value="{{ option }}">{{ display }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -159,13 +159,13 @@
                 </div>
                 <div class="form-group">
                     <label>Cantidad</label>
-                    <input type="text" name="ingredient_quantity">
+                    <input type="number" name="ingredient_quantity" min="0">
                 </div>
                 <div class="form-group">
                     <label>Medida</label>
                     <select name="ingredient_measurement">
-                        {% for option, display in recipe.recipeingredient_set.first.MEASUREMENT_CHOICES %}
-                        <option value="{{ option }}">{{ display }}</option>
+                        {% for option, display in measurement_choices %}
+                            <option value="{{ option }}">{{ display }}</option>
                         {% endfor %}
                     </select>
                 </div>

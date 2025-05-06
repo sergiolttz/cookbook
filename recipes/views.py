@@ -1,5 +1,6 @@
+from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import RecipeForm, RecipeForm, IngredientForm, RecipeIngredientForm, StepForm, RatingForm, UserProfileForm
+from .forms import RecipeForm, IngredientForm, RecipeIngredientForm, StepForm, RatingForm, UserProfileForm, CustomPasswordChangeForm
 from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile, Tag
 import pdfkit
 from django.http import HttpResponse
@@ -15,7 +16,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
-from .forms import UserProfileForm, CustomPasswordChangeForm 
 
 def home(request):
     """Vista para la página de inicio."""
@@ -198,14 +198,17 @@ def recipe_create(request):
         form = RecipeForm(request.POST, request.FILES)
         ingredient_formset = IngredientFormSet(request.POST, prefix='ingredients')
         step_formset = StepFormSet(request.POST, prefix='steps')
-        selected_tags = request.POST.getlist('tags')  # Obtener etiquetas seleccionadas #new
+        selected_tags = request.POST.getlist('tags')
+
+        # Crear los formularios vacíos también para usarlos en el render
+        ingredient_empty_form_html = ingredient_formset.empty_form.as_p
+        step_empty_form_html = step_formset.empty_form.as_p
 
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
 
-            # Guardar ingredientes y pasos 
             for ingredient_form in ingredient_formset:
                 if ingredient_form.cleaned_data and ingredient_form.cleaned_data.get('ingredient_name'):
                     ingredient, created = Ingredient.objects.get_or_create(name=ingredient_form.cleaned_data['ingredient_name'])
@@ -226,11 +229,11 @@ def recipe_create(request):
                     )
                     step_number += 1
 
-            # Guardar etiquetas seleccionadas
             for tag_id in selected_tags:
                 recipe.tags.add(tag_id)
 
             return redirect('recipe-detail', pk=recipe.pk)
+
     else:
         form = RecipeForm()
         ingredient_formset = IngredientFormSet(prefix='ingredients')
@@ -238,7 +241,7 @@ def recipe_create(request):
         ingredient_empty_form_html = ingredient_formset.empty_form.as_p
         step_empty_form_html = step_formset.empty_form.as_p
 
-    user_profile = None  # Inicializa user_profile
+    user_profile = None
     if request.user.is_authenticated:
         try:
             user_profile = UserProfile.objects.get(user=request.user)
@@ -251,9 +254,9 @@ def recipe_create(request):
         'step_formset': step_formset,
         'ingredient_empty_form_html': ingredient_empty_form_html,
         'step_empty_form_html': step_empty_form_html,
-        'tag_types': tag_types,  # new
-        'all_tags': Tag.objects.all(),  # new
-        'user_profile': user_profile,  # Añade user_profile al contexto
+        'tag_types': tag_types,
+        'all_tags': Tag.objects.all(),
+        'user_profile': user_profile,
     })
 
 register = template.Library()
@@ -262,43 +265,74 @@ register = template.Library()
 def modulo(value, arg):
     return value % arg
 
+
 @login_required
 def recipe_update(request, pk):
-    """Vista para editar una receta existente."""
     recipe = get_object_or_404(Recipe, pk=pk)
-
-    if recipe.author != request.user:
-        return redirect('recipe-detail', pk=recipe.pk)
-
-    tag_types = Tag.objects.values_list('tag_type', flat=True).distinct()  # new
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
-        selected_tags = request.POST.getlist('tags')  # new
 
         if form.is_valid():
-            form.save()
-            recipe.tags.clear()  # Limpiar etiquetas existentes #new
-            for tag_id in selected_tags:  # new
-                recipe.tags.add(tag_id)  # new
+            recipe = form.save()
+
+            # Limpiar datos anteriores
+            recipe.recipeingredient_set.all().delete()
+            recipe.steps.all().delete()
+
+            # Ingredientes
+            ingredient_names = request.POST.getlist('ingredient_name')
+            ingredient_quantities = request.POST.getlist('ingredient_quantity')
+            ingredient_measurements = request.POST.getlist('ingredient_measurement')
+
+            for name, quantity, measurement in zip(ingredient_names, ingredient_quantities, ingredient_measurements):
+                if name.strip():
+                    # Procesar cantidad
+                    try:
+                        quantity_decimal = Decimal(quantity.strip()) if quantity.strip() else None
+                    except InvalidOperation:
+                        quantity_decimal = None  # Ignora cantidades inválidas
+
+                    ingredient, _ = Ingredient.objects.get_or_create(name=name.strip())
+                    RecipeIngredient.objects.create(
+                        recipe=recipe,
+                        ingredient=ingredient,
+                        quantity=quantity_decimal,
+                        measurement=measurement.strip() if measurement.strip() else ''
+                    )
+
+            # Pasos
+            step_descriptions = request.POST.getlist('step_description')
+            for i, description in enumerate(step_descriptions):
+                if description.strip():
+                    Step.objects.create(
+                        recipe=recipe,
+                        step_number=i + 1,
+                        description=description.strip()
+                    )
+
+            # Etiquetas
+            tags = request.POST.getlist('tags')
+            recipe.tags.set(tags)
+
             return redirect('recipe-detail', pk=recipe.pk)
+
     else:
         form = RecipeForm(instance=recipe)
 
-    user_profile = None  # Inicializa user_profile
-    if request.user.is_authenticated:
-        try:
-            user_profile = UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
-            pass
+    all_tags = recipe.tags.model.objects.all()
+    tag_types = set(tag.tag_type for tag in all_tags)
 
-    return render(request, 'recipe-update.html', {
+    context = {
         'form': form,
         'recipe': recipe,
+        'all_tags': all_tags,
         'tag_types': tag_types,
-        'all_tags': Tag.objects.all(),
-        'user_profile': user_profile,  # Añade user_profile al contexto
-    })
+        'measurement_choices': RecipeIngredient.MEASUREMENT_CHOICES,
+    }
+
+    return render(request, 'recipe-update.html', context)
+
 
 @login_required
 def recipe_delete(request, pk):

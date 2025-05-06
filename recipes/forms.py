@@ -14,7 +14,7 @@ class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
         fields = ['title', 'description', 'image', 'time_required', 'servings']
-        exclude = ['ingredients'] #Mantener solo esta definición, que excluye ingredients
+        exclude = ['ingredients'] 
         widgets = {
             'image': forms.FileInput(attrs={'id': 'upload-button', 'style': 'display: none;'}),
         }
@@ -36,8 +36,16 @@ class RecipeForm(forms.ModelForm):
 
 class IngredientForm(forms.Form):
     ingredient_name = forms.CharField(max_length=100)
-    ingredient_quantity = forms.DecimalField(max_digits=10, decimal_places=2)
-    ingredient_measurement = forms.ChoiceField(choices=RecipeIngredient.MEASUREMENT_CHOICES)
+    ingredient_quantity = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        min_value=0
+    )
+    ingredient_measurement = forms.ChoiceField(
+        choices=RecipeIngredient.MEASUREMENT_CHOICES,
+        required=False
+    )
 
 class StepForm(forms.Form):
     step_description = forms.CharField(widget=forms.Textarea)

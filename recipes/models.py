@@ -52,9 +52,10 @@ class Rating(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True) 
     MEASUREMENT_CHOICES = [
+        ('', '---------'),
         ('gr', 'Gramo(s)'),
         ('kg', 'Kilogramo(s)'),
         ('ml', 'Mililitros'),
@@ -65,7 +66,7 @@ class RecipeIngredient(models.Model):
         ('u', 'Unidad(es)'),
         ('pizca', 'Pizca(s)'),
     ]
-    measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES)
+    measurement = models.CharField(max_length=10, choices=MEASUREMENT_CHOICES, blank=True, null=True) 
 
     def __str__(self):
         return f'{self.ingredient.name} en {self.recipe.title}'

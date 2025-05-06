@@ -125,7 +125,6 @@
 
     // Renderizar las opciones del selector de unidades en la plantilla
     const measurementChoicesHtml = `
-        <option value="" selected="">---------</option>
         {% for choice in ingredient_formset.forms.0.fields.ingredient_measurement.choices %}
         <option value="{{ choice.0 }}">{{ choice.1 }}</option>
         {% endfor %}
@@ -138,7 +137,7 @@
             </div>
             <div class="form-group">
                 <label for="id_ingredients-__prefix__-ingredient_quantity">Cantidad:</label>
-                <input type="number" name="ingredients-__prefix__-ingredient_quantity" step="0.01" id="id_ingredients-__prefix__-ingredient_quantity">
+                <input type="number" name="ingredients-__prefix__-ingredient_quantity" step="1" id="id_ingredients-__prefix__-ingredient_quantity">
             </div>
             <div class="form-group">
                 <label for="id_ingredients-__prefix__-ingredient_measurement">Medida:</label>

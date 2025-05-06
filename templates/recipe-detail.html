@@ -80,8 +80,13 @@
             <ul>
                 {% for recipe_ingredient in recipe.recipeingredient_set.all %}
                 <li>
-                    {{ recipe_ingredient.ingredient.name }} - {{ recipe_ingredient.quantity }}
-                    {% if recipe_ingredient.measurement %} {{ recipe_ingredient.measurement }} {% endif %}
+                    {{ recipe_ingredient.ingredient.name }}
+                    {% if recipe_ingredient.quantity %}
+                    - {{ recipe_ingredient.quantity }}
+                    {% if recipe_ingredient.measurement %}
+                    {{ recipe_ingredient.get_measurement_display }}
+                    {% endif %}
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
