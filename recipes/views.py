@@ -339,9 +339,6 @@ def recipe_delete(request, pk):
     """Vista para eliminar una receta."""
     recipe = get_object_or_404(Recipe, pk=pk)
 
-    # Verifica si el usuario actual es el autor de la receta
-    if recipe.author != request.user:
-        return redirect('recipe-detail', pk=recipe.pk)  # O muestra un mensaje de error
 
     if request.method == 'POST':
         recipe.delete()

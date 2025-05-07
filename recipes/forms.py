@@ -30,8 +30,11 @@ class RecipeForm(forms.ModelForm):
         
     def clean_image(self):
         image = self.cleaned_data.get('image')
-        if image and image.size > 2 * 1024 * 1024:  # 2 MB
-            raise ValidationError("La imagen no puede pesar más de 2 MB.")
+        
+        if image and hasattr(image, 'size'):
+            if image.size > 2 * 1024 * 1024:  # 2 MB
+                raise forms.ValidationError("La imagen no puede superar los 2MB.")
+        
         return image
 
 class IngredientForm(forms.Form):
