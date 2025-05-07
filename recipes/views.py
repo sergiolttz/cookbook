@@ -429,7 +429,7 @@ def edit_profile(request):
             if profile_form.is_valid():
                 profile_form.save()
                 messages.success(request, 'Tu perfil ha sido actualizado exitosamente.')
-                return redirect('edit_profile')
+                return redirect('user_profile', username=request.user.username)
             else:
                 messages.error(request, 'Por favor, corrige los errores en el perfil.')
 
@@ -439,7 +439,7 @@ def edit_profile(request):
                 user = password_form.save()
                 update_session_auth_hash(request, user)
                 messages.success(request, 'Tu contraseña ha sido cambiada exitosamente.')
-                return redirect('edit_profile')
+                return redirect('user_profile', username=request.user.username)
             else:
                 messages.error(request, 'Por favor, corrige los errores en la contraseña.')
 

@@ -3,13 +3,26 @@
 {% block content %}
 <div class="edit-profile-container">
     <h1>Editar perfil</h1>
+
+    <!-- Formulario para editar perfil -->
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
         <div class="form-group">
             <h2>Foto de perfil:</h2>
-            {{ profile_form.profile_picture }}
+
+            {% if user_profile.profile_picture %}
+            <img src="{{ user_profile.profile_picture.url }}" alt="Foto de perfil actual" class="profile-image">
+            {% endif %}
+
+            <input type="file" name="profile_picture" id="id_profile_picture">
             {{ profile_form.profile_picture.errors }}
+
+            {% if user_profile.profile_picture and user_profile.profile_picture.url != '/media/profile_pics/default.jpg' %}
+            <button type="submit" name="remove_picture" class="remove-picture-btn">Eliminar Foto</button>
+            {% endif %}
         </div>
+
 
         <div class="form-group">
             <h2>País:</h2>
@@ -36,7 +49,7 @@
         </div>
 
         {% for field in profile_form %}
-        {% if field.name != 'profile_picture' and field.name != 'country' and field.name != 'first_name' and field.name != 'last_name' and field.name != 'email' %}
+        {% if field.name not in 'profile_picture country first_name last_name email' %}
         <div class="form-group">
             {{ field.label_tag }}
             {{ field }}
@@ -47,31 +60,39 @@
 
         <button type="submit" name="save_profile">Guardar Cambios del Perfil</button>
     </form>
+
     <hr>
+
+    <!-- Formulario para cambiar contraseña -->
     <h2>Cambiar Contraseña</h2>
     <form method="post">
         {% csrf_token %}
         {{ password_form.as_p }}
         <button type="submit" name="change_password">Cambiar Contraseña</button>
     </form>
+
     <hr>
+
+    <!-- Desactivar cuenta -->
     <div class="desactivar-cuenta">
         <h2>Desactivar cuenta</h2>
         <p>Esta acción es irreversible. Tu cuenta será desactivada y tus recetas creadas desaparecerán. Por favor, ten
             cuidado.</p>
         <button id="desactivarCuentaBtn">Desactivar Cuenta</button>
-        <div id="confirmarDesactivacion">
+
+        <div id="confirmarDesactivacion" style="display: none;">
             <form method="post" action="{% url 'deactivate_account' %}">
                 {% csrf_token %}
-                <label for="password_confirm_deactivate">Ingresa tu contraseña para confirmar la
-                    desactivación:</label>
+                <label for="password_confirm_deactivate">Ingresa tu contraseña para confirmar la desactivación:</label>
                 <input type="password" id="password_confirm_deactivate" name="password_confirm_deactivate" required>
                 <button type="submit">Confirmar Desactivación</button>
                 <button type="button" id="cancelarDesactivacion">Cancelar</button>
             </form>
         </div>
     </div>
+
     <hr>
+
     <a href="{% url 'user_profile' request.user.username %}" class="volver-perfil-btn">Volver al Perfil</a>
 </div>
 

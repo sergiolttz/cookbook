@@ -652,6 +652,12 @@
     background-color: var(--primarioOscuro);
 }
 
+img.profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 200px;
+}
+
 /*Estilos para login, signup, logout*/
 .form-group {
     margin-bottom: 15px;
