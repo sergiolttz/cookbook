@@ -21,8 +21,8 @@ Este es un proyecto web desarrollado en **Django** que permite a los usuarios cr
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/tu-repo.git
-cd tu-repo
+git clone https://github.com/sergiolttz/cookbook
+cd cookbook
 ```
 
 ### 2. Crear un entorno virtual
