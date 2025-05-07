@@ -1,0 +1,75 @@
+# TasteBook
+
+Este es un proyecto web desarrollado en **Django** que permite a los usuarios crear, guardar y compartir recetas de cocina. El sistema incluye funcionalidades para agregar ingredientes, pasos y demás detalles personalizados en cada receta.
+
+## Características
+
+- **Registro y autenticación de usuarios**: Los usuarios pueden registrarse, iniciar sesión y administrar sus recetas.
+- **Creación de recetas**: Los usuarios pueden agregar y editar recetas con detalles como ingredientes, pasos, tiempo de preparación, etc.
+- **Interfaz amigable y responsive**: La aplicación está optimizada para ser usada en dispositivos móviles y escritorios.
+- **Interactividad**: Los usuarios pueden agregar ingredientes y pasos dinámicamente sin necesidad de recargar la página.
+
+## Tecnologías utilizadas
+
+- **Backend**: Django 4.x
+- **Frontend**: HTML, CSS (con optimización para diseño responsive), JavaScript
+- **Base de datos**: SQLite (por defecto en desarrollo, pero compatible con PostgreSQL u otras bases de datos en producción)
+- **Despliegue**: PythonAnywhere
+
+## Instalación
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/tu-usuario/tu-repo.git
+cd tu-repo
+```
+
+### 2. Crear un entorno virtual
+En Linux:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+En Windows
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 3. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configurar la base de datos
+
+```bash
+python manage.py migrate
+```
+
+### 5. Crear un superusuario (opcional)
+
+```bash
+python manage.py createsuperuser
+```
+
+### 6. Ejecutar el servidor
+
+```bash
+python manage.py runserver
+```
+
+Accede a la aplicación en `http://127.0.0.1:8000/`.
+
+## Uso
+
+1. **Registro y inicio de sesión**: Los usuarios pueden registrarse y acceder a su cuenta para guardar recetas.
+2. **Crear recetas**: Los usuarios pueden crear recetas, agregar ingredientes y pasos dinámicamente.
+3. **Editar recetas**: Los usuarios pueden actualizar las recetas que han creado.
+
+
+## Licencia
+
+Este proyecto está licenciado bajo la **MIT License** - consulta el archivo [LICENSE](LICENSE) para más detalles.
