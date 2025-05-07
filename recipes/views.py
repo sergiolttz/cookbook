@@ -2,7 +2,6 @@ from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import RecipeForm, IngredientForm, RecipeIngredientForm, StepForm, RatingForm, UserProfileForm, CustomPasswordChangeForm
 from .models import Recipe, Ingredient, RecipeIngredient, Step, Rating, UserProfile, Tag
-import pdfkit
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
@@ -353,25 +352,6 @@ def recipe_delete(request, pk):
 
     return render(request, 'recipe-delete.html', {'recipe': recipe, 'user_profile': user_profile})
 
-def recipe_pdf(request, pk):
-    """Vista para generar un PDF de la receta."""
-    recipe = get_object_or_404(Recipe, pk=pk)
-
-    image_url = request.build_absolute_uri(recipe.image.url) if recipe.image else None
-    logo_url = request.build_absolute_uri(staticfiles_storage.url('images/logo.png'))
-
-    html_string = render_to_string('recipe-pdf.html', {'recipe': recipe, 'image_url': image_url, 'logo_url': logo_url})
-
-    config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
-    options = {
-        'encoding': 'UTF-8',
-    }
-    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
-
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{recipe.title}.pdf"'
-
-    return response
 
 def user_profile(request, username):
     """Vista para ver el perfil de usuario."""

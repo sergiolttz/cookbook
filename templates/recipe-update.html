@@ -110,7 +110,7 @@
             {% for step in recipe.steps.all %}
             <div class="step-form">
                 <div class="form-group">
-                    <label for="step_description">Paso {{ step.step_number }}:</label>
+                    <label for="step_description">Descripción del paso:</label>
                     <textarea name="step_description">{{ step.description }}</textarea>
                 </div>
                 <button type="button" class="remove-step">Eliminar Paso</button>
@@ -118,7 +118,7 @@
             {% endfor %}
             <div class="step-form">
                 <div class="form-group">
-                    <label for="step_description">Paso {{ recipe.steps.count|add:1 }}:</label>
+                    <label for="step_description">Descripción del paso:</label>
                     <textarea name="step_description"></textarea>
                 </div>
                 <button type="button" class="remove-step">Eliminar Paso</button>
@@ -189,7 +189,7 @@
             newRow.classList.add('step-form');
             newRow.innerHTML = `
                 <div class="form-group">
-                    <label for="step_description">Paso ${stepCount}:</label>
+                    <label for="step_description">Descripción del paso:</label>
                     <textarea name="step_description"></textarea>
                 </div>
                 <button type="button" class="remove-step">Eliminar Paso</button>

@@ -104,7 +104,6 @@
                 <button class="button" id="copy-link">Copiar Enlace</button>
                 <input type="text" id="recipe-link" value="{{ request.build_absolute_uri }}" readonly
                     style="display: none;">
-                <a href="{% url 'recipe-pdf' pk=recipe.pk %}" class="button">Descargar PDF</a>
                 <a href="{% url 'recipes-list' %}" class="button">Volver a la lista de recetas</a>
             </div>
         </div>

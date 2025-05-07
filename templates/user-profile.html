@@ -5,7 +5,7 @@
 <div class="profile-detail-container">
     <div class="profile-detail-header">
         {% if user.profile.profile_picture %}
-        <img src="{{ user.profile.profile_picture.url }}" alt="Avatar">
+        <img src="{{ user_profile.profile_picture.url }}" alt="Avatar">
         {% else %}
         <img src="{% static 'images/default-avatar.jpg' %}" alt="Avatar por defecto">
         {% endif %}
